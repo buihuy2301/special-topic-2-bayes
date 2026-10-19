@@ -1,0 +1,71 @@
+% Shared preamble for report.tex (and slides, if added later).
+% Compile with XeLaTeX: latexmk -xelatex <file>.tex
+
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setmainlanguage{vietnamese}
+\setmainfont{texgyretermes}[
+  Extension      = .otf,
+  UprightFont    = *-regular,
+  BoldFont       = *-bold,
+  ItalicFont     = *-italic,
+  BoldItalicFont = *-bolditalic,
+]
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{mathtools}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage{xcolor}
+
+% Vietnamese decimal marker, so that \num agrees with the decimals written by
+% hand in the prose (0{,}71 rather than 0.71).
+\sisetup{output-decimal-marker={,}, group-separator={\,}, group-minimum-digits=4}
+
+\graphicspath{{figures/}{../outputs/figures/}}
+
+% ---------------------------------------------------------------------------
+% Notation
+% ---------------------------------------------------------------------------
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\N}{\mathcal{N}}
+\newcommand{\trans}{^{\top}}
+\newcommand{\HP}{\mathrm{HP}}
+\newcommand{\USA}{\mathrm{USA}}
+\newcommand{\Wt}{\mathrm{Weight}}
+\newcommand{\City}{\mathrm{City}}
+\newcommand{\Rhat}{\widehat{R}}
+\DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+
+% ---------------------------------------------------------------------------
+% Figure inclusion that tolerates figures which have not been generated yet.
+% Figures come from ../outputs/figures/, written by the notebook as PNG.
+% [#1] = width as a fraction of \linewidth, #2 = file stem, #3 = caption,
+% #4 = label
+% ---------------------------------------------------------------------------
+% The figure stems contain underscores, so the name has to be detokenized
+% before it is typeset.
+\newcommand{\missingfigbox}[1]{%
+  \fbox{\parbox[c][3.2cm][c]{0.86\linewidth}{\centering
+    \texttt{\detokenize{#1}.png}\par\vspace{4pt}
+    \small chưa được sinh ra từ notebook\par}}%
+}
+
+% Placement is [tp] rather than [htbp] on purpose: with 'h' a figure declared
+% between two paragraphs cuts the argument in half, and with 'b' it lands under
+% a paragraph that continues on the next page.
+\newcommand{\resultfig}[4][0.8]{%
+  \begin{figure}[tp]
+    \centering
+    \IfFileExists{../outputs/figures/#2.png}
+      {\includegraphics[width=#1\linewidth]{../outputs/figures/#2.png}}
+      {\missingfigbox{#2}}
+    \caption{#3}
+    \label{#4}
+  \end{figure}%
+}
