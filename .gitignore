@@ -46,3 +46,17 @@ htmlcov/
 *.synctex.gz
 *.toc
 *.xdv
+
+# Bài thường xuyên và giữa kỳ (cá nhân) — không nộp kèm bài cuối kỳ
+/bai-thuong-xuyen/
+/bai-giua-ky/
+
+# Tài liệu do AI sinh ra trong quá trình làm bài (rà soát, tổng hợp yêu cầu, đề cương)
+/requirement.md
+/review.md
+/cuoi-ky-nhom10/de-cuong-bao-cao.pdf
+CLAUDE.md
+.claude/
+
+# Kết quả MCMC (~120 MB), sinh lại bằng build_notebook.py
+/cuoi-ky-nhom10/outputs/idata/

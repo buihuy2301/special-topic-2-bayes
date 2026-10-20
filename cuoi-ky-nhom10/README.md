@@ -1,7 +1,7 @@
 # Hồi quy tuyến tính Bayes — Xe mới tại Mỹ năm 1993
 
-Code cho báo cáo cuối kỳ (nhóm 10, dữ liệu `Q_10/`), theo đề cương `de-cuong-bao-cao.pdf`.
-Báo cáo LaTeX nằm trong `report/`.
+Code cho báo cáo cuối kỳ (nhóm 10, dữ liệu `Q_10/`).
+Báo cáo: `report/bao-cao-cuoi-ky-nhom10.pdf` (nguồn LaTeX `report/bao-cao-cuoi-ky-nhom10.tex`).
 Python + PyMC + ArviZ, seed 2026, NUTS 4 chuỗi × 2000 vòng (1000 warm-up).
 
 ## Chạy
@@ -31,7 +31,7 @@ PyTensor không biên dịch được C trên toolchain macOS này (clang báo l
 | `analysis/common.py` | chung | — | đường dẫn, seed, chuẩn hoá, định nghĩa M1–M5 |
 
 Mọi kết quả nằm trong `outputs/`: `figures/` (tên hình theo mục, ví dụ `fig_2_6_scatter.png`), `tables/` (CSV),
-`idata/` (NetCDF), và `results.json` (các con số chính để viết báo cáo).
+`idata/` (NetCDF, ~120 MB, không đưa lên git — chạy `build_notebook.py` để sinh lại), và `results.json` (các con số chính để viết báo cáo).
 
 ## Quyết định mô hình hoá
 
