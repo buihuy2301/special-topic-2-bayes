@@ -1,5 +1,5 @@
-% Shared preamble for report.tex (and slides, if added later).
-% Compile with XeLaTeX: latexmk -xelatex <file>.tex
+% Fonts, mathematics, notation and figure helpers shared by every report.
+% Loaded by layout.tex; compile the reports with XeLaTeX.
 
 \usepackage{fontspec}
 \usepackage{polyglossia}
@@ -25,7 +25,12 @@
 % hand in the prose (0{,}71 rather than 0.71).
 \sisetup{output-decimal-marker={,}, group-separator={\,}, group-minimum-digits=4}
 
-\graphicspath{{figures/}{../outputs/figures/}}
+% Each report sets \figdir (where its generated figures live) before loading the
+% layout; the logo and any hand-made figures sit in shared/figures/.
+\providecommand{\figdir}{figures}
+% Expanded now, so the paths do not depend on the macros staying defined.
+\edef\reportgraphicspath{\noexpand\graphicspath{{figures/}{\sharedir/figures/}{\figdir/}}}
+\reportgraphicspath
 
 % ---------------------------------------------------------------------------
 % Notation
@@ -44,7 +49,7 @@
 
 % ---------------------------------------------------------------------------
 % Figure inclusion that tolerates figures which have not been generated yet.
-% Figures come from ../outputs/figures/, written by the notebook as PNG.
+% Figures come from \figdir as PNG, written by the report's own script/notebook.
 % [#1] = width as a fraction of \linewidth, #2 = file stem, #3 = caption,
 % #4 = label
 % ---------------------------------------------------------------------------
@@ -62,8 +67,8 @@
 \newcommand{\resultfig}[4][0.8]{%
   \begin{figure}[tp]
     \centering
-    \IfFileExists{../outputs/figures/#2.png}
-      {\includegraphics[width=#1\linewidth]{../outputs/figures/#2.png}}
+    \IfFileExists{\figdir/#2.png}
+      {\includegraphics[width=#1\linewidth]{\figdir/#2.png}}
       {\missingfigbox{#2}}
     \caption{#3}
     \label{#4}

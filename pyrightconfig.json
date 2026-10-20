@@ -1,1 +1,1 @@
-{ "venvPath": ".", "venv": ".venv", "extraPaths": ["analysis"] }
+{ "venvPath": ".", "venv": ".venv", "extraPaths": ["bai-cuoi-ky/analysis"] }

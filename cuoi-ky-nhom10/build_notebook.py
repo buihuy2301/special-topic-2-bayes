@@ -41,9 +41,9 @@ nb.cells.append(nbformat.v4.new_markdown_cell(
     "# Hồi quy tuyến tính Bayes — Xe mới tại Mỹ năm 1993\n\n"
     "Notebook chung, ghép từ 5 module trong `analysis/` (chạy `build_notebook.py` để tạo lại). "
     "Biến phản hồi: City (MPG, mô hình hoá trên thang log), biến giải thích chính: Horsepower."))
-nb.cells.append(nbformat.v4.new_code_cell(
-    "import sys\n"
-    f"sys.path.insert(0, {str(ROOT / 'analysis')!r})"))
+# Relative to the notebook's folder, so the notebook keeps working wherever the
+# repository is cloned.
+nb.cells.append(nbformat.v4.new_code_cell('import sys\nsys.path.insert(0, "analysis")'))
 for name in ORDER:
     nb.cells.extend(cells_from_script(ROOT / "analysis" / f"{name}.py"))
 nb.metadata["kernelspec"] = {"name": "python3", "display_name": "Python 3", "language": "python"}

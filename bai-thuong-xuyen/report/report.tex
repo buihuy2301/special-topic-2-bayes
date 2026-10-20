@@ -1,0 +1,364 @@
+% Bài thường xuyên (cá nhân). Layout shared with the other reports of the
+% course in ../../shared/.
+% Compile with XeLaTeX: latexmk -xelatex report.tex
+\documentclass[12pt,a4paper]{report}
+
+\newcommand{\sharedir}{../../shared}
+\input{\sharedir/layout.tex}
+
+% ============ TITLE PAGE FIELDS ============
+\newcommand{\reporttitle}{BÀI TẬP THƯỜNG XUYÊN}
+\newcommand{\reportname}{Mô hình hồi quy tuyến tính Bayes: \\
+  ý nghĩa ứng dụng và so sánh với hồi quy tuyến tính thông thường}
+\newcommand{\studentlabel}{Học viên thực hiện}
+\newcommand{\studentname}{Bùi Quang Huy (25007877)}
+
+\begin{document}
+
+\makereporttitlepage
+
+\chapter*{Tóm tắt}
+\addcontentsline{toc}{chapter}{Tóm tắt}
+
+Bài viết trình bày mô hình hồi quy tuyến tính Bayes, ý nghĩa ứng dụng và
+những ưu điểm, hạn chế so với hồi quy tuyến tính thông thường. Trong cách tiếp
+cận Bayes, kết quả ước lượng được biểu diễn bằng phân phối hậu nghiệm của các
+tham số, qua đó định lượng bất định trong suy luận và dự đoán. Phần liên hệ công
+việc xem xét khả năng áp dụng mô hình vào vận hành dữ liệu tại ngân hàng, gồm
+dự báo thời gian xử lý, khối lượng dữ liệu, nhu cầu lưu trữ và giám sát chất
+lượng dữ liệu. Việc lựa chọn phương pháp cần cân nhắc cỡ mẫu, yêu cầu về độ trễ,
+chi phí tính toán và khả năng kiểm tra, giải thích mô hình.
+
+\tableofcontents
+\pagebreak
+
+\listoftables
+\newpage
+
+% ===========================================================================
+\chapter{Thế nào là mô hình hồi quy tuyến tính Bayes}
+\label{sec:what}
+
+\section{Xuất phát từ hồi quy tuyến tính thông thường}
+
+Hồi quy tuyến tính mô tả biến phản hồi $y$ bằng một tổ hợp tuyến tính của $p$
+biến giải thích cộng một sai số ngẫu nhiên. Với $n$ quan sát, viết dưới dạng ma
+trận,
+%
+\begin{equation}
+  \label{eq:linreg}
+  y = X\beta + \varepsilon, \qquad \varepsilon \sim \N(0, \sigma^2 I_n),
+\end{equation}
+%
+trong đó $X \in \R^{n \times p}$ là ma trận thiết kế (cột đầu thường là cột
+hằng ứng với hệ số chặn), $\beta \in \R^{p}$ là vector hệ số và $\sigma^2$ là
+phương sai nhiễu. Hồi quy thông thường coi $\beta$ và $\sigma^2$ là các hằng số
+cố định nhưng chưa biết, và ước lượng chúng bằng bình phương tối thiểu (OLS),
+trùng với ước lượng hợp lý cực đại khi nhiễu chuẩn:
+%
+\begin{equation}
+  \label{eq:ols}
+  \hat\beta_{\text{OLS}} = \bigl(X\trans X\bigr)^{-1} X\trans y .
+\end{equation}
+%
+Kết quả là ước lượng điểm $\hat\beta$, kèm sai số chuẩn và khoảng tin cậy được diễn
+giải theo tần suất: nếu lặp lại việc lấy mẫu nhiều lần thì 95\% số khoảng tin
+cậy dựng theo cùng cách sẽ chứa giá trị thật.
+
+\section{Ba thành phần của mô hình Bayes}
+
+Hồi quy tuyến tính Bayes giữ nguyên phương trình \eqref{eq:linreg}, nhưng coi
+$\beta$ và $\sigma^2$ là các biến ngẫu nhiên. Mô hình gồm ba thành phần
+\cite{gelman2013bda, bishop2006prml}.
+
+\begin{itemize}
+  \item \textbf{Hàm hợp lý} (likelihood) $p(y \mid X, \beta, \sigma^2)$, mô tả
+    dữ liệu khi các tham số đã được xác định. Với \eqref{eq:linreg} đó là
+    phân phối $\N(X\beta, \sigma^2 I_n)$.
+  \item \textbf{Phân phối tiên nghiệm} (prior) $p(\beta, \sigma^2)$, mô tả hiểu
+    biết về tham số trước khi quan sát dữ liệu: có thể ít thông tin, chẳng hạn
+    $\beta_j \sim \N(0, 100^2)$, hoặc mang thông tin từ kinh nghiệm hay nghiên
+    cứu trước.
+  \item \textbf{Phân phối hậu nghiệm} (posterior), kết hợp hai thành phần trên
+    theo định lý Bayes:
+    %
+    \begin{equation}
+      \label{eq:bayes}
+      p(\beta, \sigma^2 \mid y, X) =
+      \frac{p(y \mid X, \beta, \sigma^2)\, p(\beta, \sigma^2)}{p(y \mid X)}
+      \;\propto\; p(y \mid X, \beta, \sigma^2)\, p(\beta, \sigma^2).
+    \end{equation}
+\end{itemize}
+
+Ước lượng mô hình Bayes là xác định phân phối hậu nghiệm này. Từ đó có thể
+suy luận về dấu, độ lớn của hệ số và xác định khoảng chứa tham số với xác suất
+hậu nghiệm 95\%.
+
+\section{Trường hợp có lời giải dạng đóng}
+\label{sec:closed-form}
+
+Để thấy rõ cơ chế, xét trường hợp đơn giản nhất: $\sigma^2$ đã biết và phân phối tiên nghiệm
+chuẩn $\beta \sim \N(m_0, V_0)$. Khi đó hậu nghiệm cũng là phân phối chuẩn,
+$\beta \mid y \sim \N(m_n, V_n)$ với
+%
+\begin{equation}
+  \label{eq:conj}
+  V_n = \Bigl(V_0^{-1} + \tfrac{1}{\sigma^2} X\trans X\Bigr)^{-1},
+  \qquad
+  m_n = V_n \Bigl(V_0^{-1} m_0 + \tfrac{1}{\sigma^2} X\trans y\Bigr).
+\end{equation}
+%
+Công thức này cho thấy hai mối liên hệ sau.
+
+\paragraph{Trung bình hậu nghiệm kết hợp thông tin tiên nghiệm và dữ liệu.} Độ chính
+xác (nghịch đảo phương sai) của hậu nghiệm bằng tổng độ chính xác của phân phối tiên nghiệm
+$V_0^{-1}$ và của dữ liệu $X\trans X / \sigma^2$. Với một biến giải thích đã
+chuẩn hoá và phân phối tiên nghiệm $\N(0, \tau^2)$, trung bình hậu nghiệm của hệ số góc là
+$w\, \hat\beta_{\text{OLS}}$ với
+$w = n / \bigl(n + \sigma^2/\tau^2\bigr)$. Khi $n$ lớn, $w$ tiến tới 1 và trung bình hậu
+nghiệm gần với ước lượng OLS; khi $n$ nhỏ hoặc tiên nghiệm tập trung, trung bình hậu nghiệm gần với trung bình tiên nghiệm hơn.
+
+\paragraph{Liên hệ với hồi quy Ridge.} Với $m_0 = 0$ và $V_0 = \tau^2 I$, trung
+bình hậu nghiệm \eqref{eq:conj} chính là nghiệm của bài toán
+%
+\begin{equation}
+  \label{eq:ridge}
+  \min_{\beta} \; \norm{y - X\beta}_2^2 + \frac{\sigma^2}{\tau^2} \norm{\beta}_2^2 ,
+\end{equation}
+%
+tức hồi quy Ridge với hệ số hiệu chỉnh $\lambda = \sigma^2 / \tau^2$
+\cite{murphy2012ml}. Trong trường hợp này, nghiệm Ridge trùng với trung bình hậu nghiệm.
+Phân phối hậu nghiệm cung cấp thêm thông tin về bất định của các tham số.
+
+\section{Phân phối dự đoán hậu nghiệm}
+
+Để dự đoán $y^\ast$ tại một điểm mới $x^\ast$, mô hình Bayes lấy trung bình dự
+đoán theo mọi giá trị tham số, có trọng số là hậu nghiệm:
+%
+\begin{equation}
+  \label{eq:predictive}
+  p(y^\ast \mid x^\ast, y) = \int p(y^\ast \mid x^\ast, \beta, \sigma^2)\,
+  p(\beta, \sigma^2 \mid y)\, d\beta\, d\sigma^2 .
+\end{equation}
+%
+Trong trường hợp dạng đóng ở trên, $y^\ast \mid y \sim
+\N\bigl(x^{\ast\top} m_n,\; \sigma^2 + x^{\ast\top} V_n x^\ast\bigr)$. Phương sai
+dự đoán gồm hai phần: biến thiên ngẫu nhiên của quan sát $\sigma^2$, và bất định về tham số
+$x^{\ast\top} V_n x^\ast$. Phần thứ hai lớn lên khi $x^\ast$ nằm xa vùng có dữ
+liệu, nên khoảng dự đoán tự động rộng ra khi phải ngoại suy.
+
+\section{Khi không có dạng đóng}
+
+Khi $\sigma^2$ cũng chưa biết và phân phối tiên nghiệm không liên hợp, hoặc khi thay hàm hợp lý
+chuẩn bằng phân phối Student-t để giảm ảnh hưởng của ngoại lai, hậu nghiệm không còn công
+thức đóng. Khi đó người ta lấy mẫu từ hậu nghiệm bằng các phương pháp Markov chain
+Monte Carlo (MCMC) như Gibbs, Metropolis--Hastings hay NUTS \cite{hoffman2014nuts},
+rồi tính mọi đại lượng cần thiết như trung bình, khoảng tin cậy hậu nghiệm hay dự đoán
+trên các mẫu đó. Các công cụ như PyMC \cite{abrilpla2023pymc}, Stan hay gói
+\texttt{brms} trong R \cite{rbloggers2026blr} hỗ trợ đặc tả mô hình và lấy mẫu hậu nghiệm. Người dùng vẫn cần lựa chọn
+phân phối tiên nghiệm, kiểm tra hội tụ và đánh giá mức độ phù hợp của mô hình.
+
+% ===========================================================================
+\chapter{Ý nghĩa ứng dụng}
+\label{sec:meaning}
+
+Một ý nghĩa ứng dụng của hồi quy Bayes là định lượng bất định bằng xác suất.
+Đặc điểm này hỗ trợ các bài toán sau.
+
+\paragraph{Trả lời trực tiếp câu hỏi người ra quyết định đặt ra.} Trong một số bài toán ra quyết định, người sử dụng quan tâm trực tiếp đến
+xác suất hệ số mang dấu dương. Phân phối hậu nghiệm cho phép tính xác suất này. Trong bài cuối kỳ của nhóm, với dữ liệu 93
+mẫu xe năm 1993, xác suất hậu nghiệm để xe Mỹ tiết kiệm nhiên liệu hơn xe nước
+ngoài cùng công suất là \num{0.003} theo mô hình đang xét. Đây là cách diễn giải xác suất
+hậu nghiệm, khác với cách diễn giải khoảng tin cậy theo tần suất.
+
+\paragraph{Định lượng bất định trong dự đoán.} Phân phối dự đoán
+\eqref{eq:predictive} cho phép xây dựng khoảng dự đoán phản ánh cả nhiễu và bất định về
+tham số. Thông tin này hỗ trợ các quyết định dựa trên dự báo,
+như lập kế hoạch nguồn lực, dự trữ, hay đặt ngưỡng cảnh báo.
+
+\paragraph{Hỗ trợ ước lượng khi dữ liệu ít.} Khi mẫu nhỏ, ước lượng OLS có thể kém ổn định,
+thậm chí không xác định khi số biến lớn hơn số quan sát. Phân phối tiên nghiệm đóng vai trò hiệu
+chỉnh, giữ hệ số trong miền hợp lý. Mô hình phân cấp còn cho các nhóm nhỏ, như
+một chi nhánh mới hay một sản phẩm mới, chia sẻ thông tin với các nhóm có nhiều dữ liệu hơn.
+
+\paragraph{Đưa tri thức có sẵn vào mô hình một cách minh bạch.} Kinh nghiệm
+chuyên gia hay kết quả nghiên cứu trước được viết thành phân phối tiên nghiệm, và có thể kiểm
+tra mức độ hợp lý của dữ liệu sinh từ mô hình bằng kiểm tra dự đoán tiên nghiệm.
+
+\paragraph{Cập nhật tuần tự.} Hậu nghiệm của lần cập nhật trước có thể dùng làm tiên nghiệm cho lần cập nhật sau. Với dạng
+đóng \eqref{eq:conj}, mô hình cập nhật khi có dữ liệu mới thông qua các phép
+tính ma trận, không cần học lại từ đầu trên toàn bộ lịch sử.
+
+Nhờ các đặc điểm này, hồi quy Bayes được dùng rộng rãi trong y sinh (thử nghiệm
+lâm sàng cỡ nhỏ), kinh tế lượng và dự báo, marketing (mô hình đánh giá hiệu quả
+kênh quảng cáo), khoa học xã hội, và kỹ thuật (hiệu chỉnh mô hình đo lường)
+\cite{gelman2013bda, mcelreath2020rethinking, kruschke2015dbda}.
+
+% ===========================================================================
+\chapter{Áp dụng trong công việc của tôi}
+\label{sec:work}
+
+\section{Bối cảnh công việc}
+
+Tôi làm kỹ sư dữ liệu (data engineer) tại một ngân hàng. Công việc chính là xây dựng và vận hành
+các quy trình xử lý đưa dữ liệu từ hệ thống nghiệp vụ (ngân hàng lõi, thẻ, ngân hàng số)
+vào kho dữ liệu, bảo đảm dữ liệu đầy đủ, chính xác và đúng hạn cho các nhóm báo cáo,
+phân tích, quản trị rủi ro và báo cáo cơ quan quản lý. Phạm vi công việc của tôi tập trung vào vận hành dữ liệu; các mô hình chấm
+điểm tín dụng và định giá do nhóm chuyên trách xây dựng. Vì vậy, phần này xem
+xét khả năng áp dụng hồi quy Bayes vào các bài toán vận hành dữ liệu.
+
+\section{Ba hướng ứng dụng trong vận hành dữ liệu}
+
+\paragraph{Dự báo thời gian chạy và khối lượng dữ liệu của tác vụ.} Các tác vụ trích xuất, biến đổi và nạp dữ liệu (ETL) hằng đêm cần hoàn
+thành trong thời hạn cam kết (SLA) để phục vụ báo cáo buổi sáng. Có thể xem xét quan hệ tuyến tính giữa thời gian xử lý và khối lượng dữ liệu
+đầu vào trên thang logarit. Thời gian xử lý cũng có thể tăng vào các kỳ đặc biệt như cuối tháng, cuối quý, kỳ chốt sổ
+hay ngày trả lương. Có thể bắt đầu với mô hình hồi quy
+$\log(\text{thời gian}) \sim \log(\text{số bản ghi}) + \text{cuối tháng} +
+\text{ngày trong tuần}$ để mô tả các yếu tố này. Phân phối dự đoán hậu nghiệm cho phép ước lượng
+xác suất tác vụ vượt thời hạn cam kết. Đội vận hành có thể dựa vào xác suất đó
+để cân nhắc khởi động sớm hoặc bổ sung tài nguyên. Dữ liệu cho các kỳ hiếm như cuối năm rất ít, chỉ vài điểm mỗi
+năm, nên thông tin tiên nghiệm và việc định lượng bất định có thể hỗ trợ dự báo.
+
+\paragraph{Giám sát chất lượng dữ liệu bằng khoảng dự đoán.} Hiện nay nhiều kiểm
+tra chất lượng dùng ngưỡng cố định, chẳng hạn cảnh báo khi số giao dịch thẻ trong
+ngày lệch quá 20\% so với hôm trước. Ngưỡng cố định có thể tạo cảnh báo nhầm vào ngày lễ hoặc
+bỏ sót tình trạng dữ liệu thiếu dần. Thay vào đó, có thể hồi quy số bản ghi hoặc tổng
+giá trị giao dịch theo xu hướng, thứ trong tuần và lịch lễ, rồi cảnh báo khi giá
+trị quan sát rơi ngoài khoảng dự đoán 99\%. Với các nguồn hay chi nhánh mới ít
+lịch sử, một mô hình phân cấp cho phép chúng dùng chung thông tin với các nguồn cùng loại có lịch sử dài hơn, thay vì phải chờ vài tháng mới có ngưỡng.
+
+\paragraph{Lập kế hoạch dung lượng lưu trữ và tính toán.} Dự báo tăng trưởng dung
+lượng kho dữ liệu cho 6 đến 12 tháng tới để đề xuất mua sắm hạ tầng. Ở đây khoảng
+dự đoán quan trọng hơn trung bình, vì chi phí thiếu dung lượng lớn hơn nhiều chi
+phí dư, và quyết định thường dựa trên phân vị 90\% hay 95\% của dự báo.
+
+\section{Các yếu tố cần cân nhắc khi áp dụng}
+
+Việc áp dụng hồi quy Bayes cần cân nhắc bốn yếu tố sau.
+
+\begin{itemize}
+  \item \textbf{Cỡ mẫu và vai trò của tiên nghiệm.} Khi cỡ mẫu lớn và dữ liệu cung cấp
+    đủ thông tin về tham số, ảnh hưởng của tiên nghiệm thường giảm. Trong mô
+    hình chuẩn với tiên nghiệm yếu thông tin, trung bình hậu nghiệm có thể gần
+    với ước lượng OLS. Cần đánh giá thêm lợi ích của phương pháp đối với các
+    nhóm nhỏ, các kỳ hiếm và yêu cầu dự đoán.
+  \item \textbf{Chi phí tính toán và độ trễ.} Thời gian lấy mẫu MCMC phụ thuộc vào
+    dữ liệu, mô hình và cấu hình tính toán. Cần đánh giá thời gian này theo yêu
+    cầu xử lý theo lô hoặc xử lý dữ liệu dạng luồng. Với yêu cầu phản hồi nhanh,
+    có thể xem xét
+    dạng đóng \eqref{eq:conj} và cập nhật tuần tự.
+  \item \textbf{Yêu cầu quản trị mô hình.} Các giả định của mô hình, bao gồm phân
+    phối tiên nghiệm, cần được ghi nhận, giải thích và đánh giá trong quy trình
+    quản trị mô hình. SR 11-7 \cite{fed2011sr117} là một tài liệu tham khảo
+    về chủ đề này. Mức độ kiểm soát cần căn cứ vào phạm vi sử dụng và mức độ
+    rủi ro của mô hình.
+  \item \textbf{Kỹ năng của đội.} Đội kỹ sư dữ liệu quen SQL, Spark và công cụ điều
+    phối, ít quen chẩn đoán hội tụ MCMC. Cách triển khai thực tế là đóng gói mô
+    hình thành một bước trong quy trình xử lý dữ liệu, với chẩn đoán tự động và ngưỡng dừng rõ
+    ràng, như cách nhóm đã làm trong bài cuối kỳ: chương trình dừng nếu $\Rhat$ vượt
+    \num{1.01} hoặc phát hiện hiện tượng phân kỳ khi lấy mẫu (divergence).
+\end{itemize}
+
+Trong phạm vi công việc của tôi, có thể xem xét hồi quy tuyến tính Bayes cho các bài toán dự báo vận hành cần khoảng dự đoán và có các nhóm
+dữ liệu nhỏ. Bước đầu hợp lý là thử trên bài toán dự báo thời gian chạy tác vụ, nơi
+dữ liệu đã có sẵn trong nhật ký của hệ thống điều phối và hiệu quả có thể đánh giá qua
+số lần vi phạm SLA.
+
+% ===========================================================================
+\chapter{Ưu điểm và nhược điểm so với hồi quy thông thường}
+\label{sec:compare}
+
+Bảng~\ref{tab:compare} tóm tắt khác biệt giữa hai cách tiếp cận. Hai cách tiếp cận có mối liên hệ: với phân phối tiên nghiệm phẳng và mẫu lớn, trung bình hậu nghiệm gần trùng ước
+lượng OLS; khác biệt nằm ở cách diễn giải và ở các tình huống mẫu nhỏ, ngoại suy
+hay cần ra quyết định trong điều kiện chưa chắc chắn.
+
+\begin{table}[tp]
+  \centering
+  \small
+  \caption{So sánh hồi quy tuyến tính thông thường (OLS) và hồi quy tuyến tính
+    Bayes.}
+  \label{tab:compare}
+  \begin{tabular}{>{\raggedright\arraybackslash}p{3.1cm}
+                  >{\raggedright\arraybackslash}p{6.6cm}
+                  >{\raggedright\arraybackslash}p{6.9cm}}
+    \toprule
+    Tiêu chí & Hồi quy thông thường (OLS) & Hồi quy Bayes \\
+    \midrule
+    Bản chất tham số & Hằng số cố định chưa biết & Biến ngẫu nhiên có phân phối \\
+    Kết quả học & Một ước lượng điểm, sai số chuẩn & Cả phân phối hậu nghiệm \\
+    Diễn giải khoảng & Khoảng tin cậy theo tần suất lặp mẫu
+      & Xác suất tham số nằm trong khoảng, với dữ liệu đã có \\
+    Tri thức có sẵn & Không đặc tả tiên nghiệm trong OLS cơ bản & Đưa vào qua phân phối tiên nghiệm \\
+    Mẫu nhỏ, nhiều biến & Bất ổn, không xác định khi $p > n$
+      & Phân phối tiên nghiệm đóng vai trò hiệu chỉnh, vẫn ước lượng được \\
+    Dự đoán & Khoảng dự đoán theo các giả định của mô hình
+      & Phân phối dự đoán có xét đến bất định về tham số \\
+    Mở rộng mô hình & Cần lý thuyết riêng cho từng biến thể
+      & Đổi hàm hợp lý, thêm tầng phân cấp mà quy trình không đổi \\
+    Chi phí tính toán & Một phép giải hệ tuyến tính & Phụ thuộc vào việc có lời giải dạng đóng hay cần lấy mẫu MCMC \\
+    Tính chủ quan & Không có phân phối tiên nghiệm & Kết quả phụ thuộc phân phối tiên nghiệm khi mẫu nhỏ \\
+    Công cụ và mức độ phổ biến & Được hỗ trợ rộng rãi trong phần mềm thống kê
+      & Cần PyMC, Stan, brms; cần hiểu chẩn đoán hội tụ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{Ưu điểm}
+
+\begin{enumerate}
+  \item \textbf{Định lượng bất định đầy đủ và dễ diễn giải.} Mọi đại lượng quan
+    tâm, kể cả hàm phi tuyến của tham số như phần trăm thay đổi hay giá trị dự
+    đoán, đều có phân phối, tính được trực tiếp từ các mẫu hậu nghiệm.
+  \item \textbf{Ổn định với mẫu nhỏ và đa cộng tuyến.} Tiên nghiệm chuẩn có tác dụng điều chuẩn tương tự hồi quy Ridge
+    \eqref{eq:ridge}, nhưng thêm vào đó là hậu nghiệm cho biết rõ hướng nào trong
+    không gian tham số còn bất định.
+  \item \textbf{Linh hoạt.} Thay hàm hợp lý chuẩn bằng Student-t để giảm ảnh hưởng của ngoại lai,
+    thêm cấu trúc phân cấp, hay xử lý dữ liệu thiếu như tham số, đều nằm trong cùng một cách tiếp cận suy luận.
+  \item \textbf{Có công cụ kiểm tra mô hình thống nhất.} Kiểm tra dự đoán hậu nghiệm
+    so sánh dữ liệu mô phỏng từ mô hình với dữ liệu quan sát; PSIS-LOO và WAIC \cite{vehtari2017loo}
+    so sánh các mô hình theo khả năng dự đoán.
+  \item \textbf{Cập nhật tuần tự} khi có thêm dữ liệu, phù hợp với các quy trình xử lý dữ liệu
+    chạy định kỳ.
+\end{enumerate}
+
+\section{Nhược điểm}
+
+\begin{enumerate}
+  \item \textbf{Phải chọn phân phối tiên nghiệm}, và với mẫu nhỏ, kết quả phụ thuộc vào lựa chọn
+    đó. Có thể đánh giá ảnh hưởng này bằng kiểm tra dự đoán tiên nghiệm và phân
+    tích độ nhạy với các lựa chọn tiên nghiệm khác nhau.
+  \item \textbf{Chi phí tính toán cao} khi không có dạng đóng; MCMC cần chạy nhiều
+    chuỗi, nhiều vòng lặp, và chậm hơn nhiều so với một phép giải OLS trên dữ
+    liệu lớn.
+  \item \textbf{Cần chẩn đoán hội tụ.} Kết quả chỉ đáng tin khi các chuỗi đã hội
+    tụ ($\Rhat < 1{,}01$, cỡ mẫu hiệu dụng đủ lớn, không phát hiện hiện tượng phân kỳ khi lấy mẫu). Đây là bước kiểm tra bổ sung khi sử dụng MCMC.
+  \item \textbf{Yêu cầu giải thích về tiên nghiệm.} Việc trình bày kết quả cho người quen
+    thống kê cổ điển cần làm rõ cách diễn giải xác suất hậu nghiệm. Trong môi
+    trường ngân hàng, cơ sở lựa chọn tiên nghiệm cũng cần được giải trình rõ ràng.
+  \item \textbf{Phụ thuộc vào giả định mô hình.} Nếu mô hình bỏ qua quan hệ phi tuyến,
+    sự phụ thuộc của sai số theo thời gian hoặc biến quan trọng, kết quả suy
+    luận có thể sai lệch ngay cả khi khoảng hậu nghiệm hẹp. Kiểm tra mô hình vẫn
+    là bắt buộc như với OLS.
+\end{enumerate}
+
+% ===========================================================================
+\chapter{Kết luận}
+\label{sec:conclusion}
+
+Hồi quy tuyến tính Bayes biểu diễn bất định về tham số bằng phân phối tiên
+nghiệm và cập nhật thành phân phối hậu nghiệm khi có dữ liệu. Cách tiếp cận này
+cho phép diễn giải kết quả bằng xác suất và xây dựng phân phối dự đoán có xét
+đến bất định về tham số. Việc áp dụng cần đi kèm lựa chọn và giải thích tiên
+nghiệm, kiểm tra mô hình, cũng như chẩn đoán hội tụ khi sử dụng MCMC.
+
+Trong công việc kỹ sư dữ liệu tại ngân hàng, tôi thấy có thể xem xét phương
+pháp này cho dự báo thời gian xử lý, khối lượng dữ liệu, nhu cầu lưu trữ và giám
+sát chất lượng dữ liệu. Một hướng thử nghiệm là dự báo thời gian chạy tác vụ từ
+nhật ký hệ thống điều phối. Kết quả thử nghiệm cần được đánh giá theo chất
+lượng dự báo, số lần vi phạm SLA và chi phí vận hành trước khi mở rộng áp dụng.
+
+\newpage
+
+\printbibliography[heading=bibintoc,title={Tài liệu tham khảo}]
+
+\end{document}
