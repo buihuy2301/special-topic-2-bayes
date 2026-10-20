@@ -385,8 +385,8 @@
     {
       "model": "M1",
       "origin": "USA",
-      "mean_city": 13.575,
-      "mean_hdi": [
+      "median_city": 13.575,
+      "median_hdi": [
         12.17,
         14.98
       ],
@@ -397,8 +397,8 @@
     {
       "model": "M1",
       "origin": "Nước ngoài",
-      "mean_city": 13.575,
-      "mean_hdi": [
+      "median_city": 13.575,
+      "median_hdi": [
         12.17,
         14.98
       ],
@@ -409,8 +409,8 @@
     {
       "model": "M3",
       "origin": "USA",
-      "mean_city": 14.291,
-      "mean_hdi": [
+      "median_city": 14.291,
+      "median_hdi": [
         12.49,
         16.11
       ],
@@ -421,8 +421,8 @@
     {
       "model": "M3",
       "origin": "Nước ngoài",
-      "mean_city": 12.859,
-      "mean_hdi": [
+      "median_city": 12.859,
+      "median_hdi": [
         10.93,
         14.8
       ],
@@ -433,8 +433,8 @@
     {
       "model": "M5",
       "origin": "USA",
-      "mean_city": 16.625,
-      "mean_hdi": [
+      "median_city": 16.625,
+      "median_hdi": [
         15.39,
         18.0
       ],
@@ -445,8 +445,8 @@
     {
       "model": "M5",
       "origin": "Nước ngoài",
-      "mean_city": 17.2,
-      "mean_hdi": [
+      "median_city": 17.2,
+      "median_hdi": [
         15.87,
         18.47
       ],

@@ -21,7 +21,11 @@ def draws(idata, terms):
 
 
 def predict_mpg(name, hp, weight, usa, kind="pred", seed=SEED):
-    """Posterior draws (S, n) of the mean ('mu') or a new observation ('pred'), in MPG."""
+    """Posterior draws (S, n) in MPG of exp(mu) ('mu') or a new observation ('pred').
+
+    The response is log(City), so exp(mu) is the conditional *median* of City, not its mean;
+    under the Student-t likelihood the mean of City does not even exist.
+    """
     s = spec[name]
     b0, b, sigma, nu = draws(idatas[name], s["terms"])
     X = design(None, sc, s["terms"], hp=hp, weight=weight, usa=usa)
@@ -134,7 +138,7 @@ pred = predict_mpg("M1", hp_grid, None, 0, kind="pred")
 ax.fill_between(hp_grid, *np.quantile(pred, [.025, .975], axis=0), color="#aed6f1", alpha=.5,
                 label="khoảng dự đoán 95%")
 band = np.array([hdi(mu[:, i]) for i in range(len(hp_grid))])
-ax.fill_between(hp_grid, band[:, 0], band[:, 1], color="#2471a3", alpha=.5, label="HDI 95% của trung bình")
+ax.fill_between(hp_grid, band[:, 0], band[:, 1], color="#2471a3", alpha=.5, label="HDI 95% của trung vị")
 ax.plot(hp_grid, np.median(mu, 0), c="#1b4f72")
 for o, sub in d.groupby("origin"):
     ax.scatter(sub["hp"], sub["city"], s=16, c=COLOR[o], label=o, zorder=3)
@@ -253,8 +257,8 @@ for name in dict.fromkeys(["M1", "M3", FINAL]):
         pred = predict_mpg(name, 300, w300, usa)[:, 0]
         mu = predict_mpg(name, 300, w300, usa, kind="mu")[:, 0]
         lo, hi = np.quantile(pred, [.025, .975])
-        q4_rows.append({"model": name, "origin": o, "mean_city": mu.mean(),
-                        "mean_hdi": hdi(mu).round(2).tolist(),
+        q4_rows.append({"model": name, "origin": o, "median_city": mu.mean(),
+                        "median_hdi": hdi(mu).round(2).tolist(),
                         "pred_median": np.median(pred), "pi95_low": lo, "pi95_high": hi})
 q4 = pd.DataFrame(q4_rows)
 q4.to_csv(TAB / "tab_5_6_q4_300hp.csv", index=False)
