@@ -1,6 +1,6 @@
 # %% [markdown]
-# # 03_models — Đặc tả M1–M5, prior predictive check, phân tích độ nhạy (Chương 3)
-# Owner: TV3. Models are defined in `common.build_model`; response = standardised
+# # 02_models — Đặc tả M1–M5, prior predictive check, phân tích độ nhạy (Chương 3)
+# Owner: Nguyễn Thị Bích Ngọc. Models are defined in `common.build_model`; response = standardised
 # log(City), predictors HP and Weight standardised, USA kept as 0/1.
 #
 # M3 (full spec, section 3.5), on the standardised scale:

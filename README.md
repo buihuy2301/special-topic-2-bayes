@@ -5,26 +5,25 @@ Bài cuối kỳ môn chuyên đề **Mô hình hồi quy tuyến tính Bayes v�
 
 | Thư mục | Nội dung |
 | --- | --- |
-| `cuoi-ky-nhom10/` | Báo cáo `report/bao-cao-cuoi-ky-nhom10.pdf` (nguồn `.tex` cùng thư mục), notebook `bayes_cars_1993.ipynb`, code phân tích `analysis/`, dữ liệu `Q_10/`, kết quả `outputs/` |
-| `tai-lieu/` | Slide bài giảng của thầy: `Gioi thieu Thong ke Bayes.pdf`, `Slide_HQTT Bayes.pdf` (hồi quy tuyến tính Bayes) |
+| `final-project/` | Báo cáo `report/bao-cao-cuoi-ky-nhom10.pdf` (nguồn `.tex` cùng thư mục), notebook `bayes_cars_1993.ipynb`, code phân tích `analysis/`, dữ liệu `Q_10/`, kết quả `outputs/` |
 | `shared/` | Mẫu trình bày LaTeX dùng chung: `layout.tex`, `preamble.tex`, `meta.tex` (tên môn, giảng viên), `refs.bib`, logo |
 
-Chi tiết cách chạy và các quyết định mô hình hoá: [`cuoi-ky-nhom10/README.md`](cuoi-ky-nhom10/README.md).
+Chi tiết cách chạy và các quyết định mô hình hoá: [`final-project/README.md`](final-project/README.md).
 
 ## Môi trường Python
 
 ```bash
 uv venv --python 3.12 .venv
 uv pip install --python .venv/bin/python -r requirements.txt
-cd cuoi-ky-nhom10 && ../.venv/bin/python build_notebook.py   # toàn bộ phân tích (~8 phút)
+cd final-project && ../.venv/bin/python build_notebook.py   # toàn bộ phân tích (~8 phút)
 ```
 
 ## Biên dịch báo cáo
 
-Báo cáo biên dịch từ thư mục `cuoi-ky-nhom10/report/` bằng XeLaTeX:
+Báo cáo biên dịch từ thư mục `final-project/report/` bằng XeLaTeX:
 
 ```bash
-cd cuoi-ky-nhom10/report && latexmk -xelatex bao-cao-cuoi-ky-nhom10.tex
+cd final-project/report && latexmk -xelatex bao-cao-cuoi-ky-nhom10.tex
 latexmk -C            # dọn file trung gian
 ```
 

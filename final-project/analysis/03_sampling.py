@@ -1,6 +1,6 @@
 # %% [markdown]
-# # 04_sampling — NUTS cho M1–M5, chẩn đoán hội tụ, Metropolis–Hastings tự cài (Chương 4)
-# Owner: TV4. Output: `outputs/idata/idata_M*.nc`, posterior tables (4.4), diagnostics (4.3).
+# # 03_sampling — NUTS cho M1–M5, chẩn đoán hội tụ, Metropolis–Hastings tự cài (Chương 4)
+# Owner: Nguyễn Thu Ngân. Output: `outputs/idata/idata_M*.nc`, posterior tables (4.4), diagnostics (4.3).
 
 # %%
 from common import *  # noqa: F401,F403

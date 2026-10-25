@@ -1,6 +1,6 @@
 # %% [markdown]
 # # 05_evaluation — PPC, so sánh mô hình, trả lời Q1–Q4 (Chương 5)
-# Owner: TV5. Runs after 04_sampling.
+# Owner: Nguyễn Hồng Phúc. Runs after 03_sampling.
 
 # %%
 from common import *  # noqa: F401,F403

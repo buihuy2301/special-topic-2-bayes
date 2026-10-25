@@ -1,6 +1,6 @@
 # %% [markdown]
-# # 02_data_eda — Làm sạch dữ liệu, thống kê mô tả, EDA (Chương 2)
-# Owner: TV2. Output: `outputs/data_clean.csv` (used by every later module),
+# # 01_data_eda — Làm sạch dữ liệu, thống kê mô tả, EDA (Chương 2)
+# Owner: Bùi Quang Huy. Output: `outputs/data_clean.csv` (used by every later module),
 # section 2.5 statistics, figures 2.6, VIF, and an OLS baseline (section 3.1).
 
 # %%
@@ -48,11 +48,11 @@ print(geo.to_string(index=False))
 # %%
 d = load_clean()
 desc = d[["city", "open_road", "hp", "weight", "engine_size", "price"]].describe().T
-desc.to_csv(TAB / "tab_2_5_describe.csv")
+desc.to_csv(TAB / "tab_2_4_describe.csv")
 print(desc.round(2).to_string())
 
 by_origin = d.groupby("origin")[["city", "hp", "weight", "engine_size", "price"]].agg(["mean", "median"])
-by_origin.to_csv(TAB / "tab_2_5_by_origin.csv")
+by_origin.to_csv(TAB / "tab_2_4_by_origin.csv")
 print(by_origin.round(1).to_string())
 
 stats_25 = {
@@ -76,15 +76,15 @@ cols = {"city": "City (MPG)", "open_road": "Open Road (MPG)", "hp": "HP",
 g = sns.pairplot(d.rename(columns=cols), vars=list(cols.values()), hue="origin",
                  palette=COLOR, corner=True, plot_kws={"s": 18, "alpha": .75},
                  diag_kws={"common_norm": False})
-g.figure.suptitle("Hình 2.6a — Ma trận scatterplot theo xuất xứ", y=1.01)
-savefig(g.figure, "fig_2_6_scatter.png")
+g.figure.suptitle("Hình 2.5a — Ma trận scatterplot theo xuất xứ", y=1.01)
+savefig(g.figure, "fig_2_5_scatter.png")
 
 corr = d[list(cols)].rename(columns=cols).corr()
-corr.to_csv(TAB / "tab_2_6_corr.csv")
+corr.to_csv(TAB / "tab_2_5_corr.csv")
 fig, ax = plt.subplots(figsize=(6, 5))
 sns.heatmap(corr, annot=True, fmt=".2f", cmap="RdBu_r", vmin=-1, vmax=1, ax=ax)
-ax.set_title("Hình 2.6b — Ma trận tương quan")
-savefig(fig, "fig_2_6_corr.png")
+ax.set_title("Hình 2.5b — Ma trận tương quan")
+savefig(fig, "fig_2_5_corr.png")
 
 # %%
 d["type_label"] = d["type"].map(TYPE_LABEL)
@@ -93,8 +93,8 @@ fig, ax = plt.subplots(figsize=(7, 4))
 sns.boxplot(d, x="type_label", y="city", order=order, color="#d5d8dc", ax=ax, showfliers=False)
 sns.stripplot(d, x="type_label", y="city", order=order, hue="origin", palette=COLOR,
               ax=ax, size=4, jitter=.2)
-ax.set(xlabel="Type", ylabel="City (MPG)", title="Hình 2.6c — City theo loại xe")
-savefig(fig, "fig_2_6_box_type.png")
+ax.set(xlabel="Type", ylabel="City (MPG)", title="Hình 2.5c — City theo loại xe")
+savefig(fig, "fig_2_5_box_type.png")
 
 # %% [markdown]
 # Preliminary outlier flags: cars far from the HP–City trend
@@ -109,9 +109,9 @@ stud = ols_eda.get_influence().resid_studentized_external
 flag = d.loc[np.abs(stud) > 2, ["name", "hp", "city"]]
 for _, r in flag.iterrows():
     ax.annotate(r["name"], (r["hp"], r["city"]), fontsize=7, xytext=(4, 2), textcoords="offset points")
-ax.set(xlabel="Horsepower (hp)", ylabel="City (MPG)", title="Hình 2.6d — HP và City, các điểm lạ sơ bộ")
+ax.set(xlabel="Horsepower (hp)", ylabel="City (MPG)", title="Hình 2.5d — HP và City, các điểm lạ sơ bộ")
 ax.legend()
-savefig(fig, "fig_2_6_hp_city_flags.png")
+savefig(fig, "fig_2_5_hp_city_flags.png")
 print(flag.assign(stud_resid=stud[np.abs(stud) > 2].round(2)).to_string(index=False))
 
 # %% [markdown]

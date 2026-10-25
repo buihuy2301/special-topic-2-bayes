@@ -119,7 +119,7 @@ class Scaler:
 # ---------------------------------------------------------------- models
 
 # Terms in each candidate model (section 3.4). M5 reuses the terms of the
-# best of M1-M4 with a Student-t likelihood and is built in 04_sampling.
+# best of M1-M4 with a Student-t likelihood and is built in 03_sampling.
 MODEL_TERMS = {
     "M1": ["hp"],
     "M2": ["hp", "usa"],
@@ -178,7 +178,7 @@ def build_model(d, sc, terms, prior="weak", likelihood="normal"):
 
 
 def model_spec():
-    """Which terms/likelihood M1-M5 use; M5 is fixed once 04_sampling has run."""
+    """Which terms/likelihood M1-M5 use; M5 is fixed once 03_sampling has run."""
     spec = {k: {"terms": v, "likelihood": "normal", "formula": MODEL_FORMULA[k]}
             for k, v in MODEL_TERMS.items()}
     res = read_results()

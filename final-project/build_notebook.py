@@ -1,7 +1,7 @@
 """Merge the five modules into one notebook and run it top to bottom.
 
 Usage: .venv/bin/python build_notebook.py [--no-exec]
-Order follows the data flow: 02 → 03 → 04 → 01 (needs idata_M1) → 05.
+Order follows the data flow: 01 → 02 → 03 → 04 (needs idata_M1) → 05.
 """
 import sys
 from pathlib import Path
@@ -10,7 +10,7 @@ import nbformat
 from nbclient import NotebookClient
 
 ROOT = Path(__file__).resolve().parent
-ORDER = ["02_data_eda", "03_models", "04_sampling", "01_conjugate", "05_evaluation"]
+ORDER = ["01_data_eda", "02_models", "03_sampling", "04_conjugate", "05_evaluation"]
 NB_PATH = ROOT / "bayes_cars_1993.ipynb"
 
 

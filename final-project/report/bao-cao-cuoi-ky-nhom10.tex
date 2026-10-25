@@ -268,7 +268,7 @@ tính. Trong phạm vi báo cáo, nhóm tập trung xây dựng mô hình cho Ci
 hỏi dự đoán của đề; kết quả định lượng cho Open Road cần được đánh giá bằng một
 mô hình riêng.
 
-\resultfig[0.95]{fig_2_6_scatter}{Ma trận biểu đồ phân tán các biến chính, tô màu
+\resultfig[0.95]{fig_2_5_scatter}{Ma trận biểu đồ phân tán các biến chính, tô màu
   theo xuất xứ.}{fig:scatter}
 
 Xét theo loại xe (hình~\ref{fig:box-type}), nhóm xe cỡ nhỏ (Small) có City cao
@@ -280,7 +280,7 @@ gồm Honda Civic ($+3{,}6$), Geo Metro ($+3{,}2$), Suzuki Swift ($+2{,}4$), For
 Aerostar ($-2{,}4$) và Volkswagen Eurovan ($-2{,}3$). Các xe này sẽ được xem xét
 lại với mô hình đầy đủ ở mục~\ref{sec:q3}.
 
-\resultfig[0.75]{fig_2_6_box_type}{City theo loại xe; điểm tô màu theo xuất
+\resultfig[0.75]{fig_2_5_box_type}{City theo loại xe; điểm tô màu theo xuất
   xứ.}{fig:box-type}
 
 % ===========================================================================
@@ -1072,6 +1072,63 @@ thang đo.
 % ===========================================================================
 \appendix
 
+\chapter{Phân công công việc}
+\label{sec:roles}
+
+Bảng~\ref{tab:roles} ghi phần lý thuyết mỗi thành viên tìm hiểu và phần code
+mỗi người viết. Mỗi thành viên viết phần báo cáo tương ứng với module của mình
+(bảng~\ref{tab:modules}).
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \caption{Phân công tìm hiểu lý thuyết và lập trình.}
+  \label{tab:roles}
+  \begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.22\linewidth}>{\raggedright\arraybackslash}p{0.38\linewidth}>{\raggedright\arraybackslash}p{0.34\linewidth}@{}}
+    \toprule
+    Thành viên & Tìm hiểu lý thuyết & Lập trình \\
+    \midrule
+    Bùi Quang Huy \newline 25007877 \newline (trưởng nhóm)
+      & Hồi quy tuyến tính, OLS, đa cộng tuyến (VIF), biến đổi biến phản hồi
+        (mục~\ref{sec:eda}, \ref{sec:transform})
+      & \texttt{01\_data\_eda.py}; khung code chung \texttt{common.py},
+        \texttt{build\_notebook.py} \\
+    \addlinespace
+    Nguyễn Thị Bích Ngọc \newline 25007937
+      & Hồi quy tuyến tính Bayes, chọn tiên nghiệm, kiểm tra dự đoán tiên
+        nghiệm, độ nhạy theo tiên nghiệm (mục~\ref{sec:candidates}--\ref{sec:sensitivity})
+      & \texttt{02\_models.py} \\
+    \addlinespace
+    Nguyễn Thu Ngân \newline 25007865
+      & MCMC: Metropolis--Hastings, NUTS, chẩn đoán hội tụ $\Rhat$, ESS
+        (mục~\ref{sec:mcmc}--\ref{sec:posterior})
+      & \texttt{03\_sampling.py}, gồm Metropolis--Hastings tự cài \\
+    \addlinespace
+    Nguyễn Thục Anh \newline 25007949
+      & Tiên nghiệm liên hợp Normal--Inverse-Gamma, hậu nghiệm dạng đóng
+        (mục~\ref{sec:conjugate})
+      & \texttt{04\_conjugate.py} \\
+    \addlinespace
+    Nguyễn Hồng Phúc \newline 25007860
+      & Kiểm tra dự đoán hậu nghiệm, PSIS-LOO, WAIC, hàm hợp lý Student-t
+        (chương~\ref{sec:evaluation})
+      & \texttt{05\_evaluation.py} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Ngoài phần việc riêng, trưởng nhóm Bùi Quang Huy:
+
+\begin{itemize}
+  \item chia đề bài thành năm module, phân công và theo dõi tiến độ;
+  \item xây dựng phần code dùng chung (\texttt{common.py}: đường dẫn, seed,
+    chuẩn hoá, định nghĩa M1--M5) và script \texttt{build\_notebook.py} ghép
+    năm module thành một notebook chạy được từ đầu đến cuối;
+  \item dựng mẫu trình bày LaTeX, tổng hợp và biên tập báo cáo, thống nhất ký
+    hiệu và số liệu giữa các chương;
+  \item rà soát kết quả của các thành viên và nộp bài.
+\end{itemize}
+
 \chapter{Mã nguồn và dữ liệu}
 \label{sec:appendix}
 
@@ -1088,10 +1145,10 @@ module được ghi ở bảng~\ref{tab:modules}.
     \toprule
     Module & Phụ trách & Mục trong báo cáo \\
     \midrule
-    \texttt{02\_data\_eda.py}   & Bùi Quang Huy & Chương~\ref{sec:data}, mục~\ref{sec:transform} \\
-    \texttt{03\_models.py}      & Nguyễn Thị Bích Ngọc & Mục~\ref{sec:candidates}--\ref{sec:sensitivity} \\
-    \texttt{04\_sampling.py}    & Nguyễn Thu Ngân & Mục~\ref{sec:mcmc}--\ref{sec:posterior} \\
-    \texttt{01\_conjugate.py}   & Nguyễn Thục Anh & Mục~\ref{sec:conjugate} \\
+    \texttt{01\_data\_eda.py}   & Bùi Quang Huy & Chương~\ref{sec:data}, mục~\ref{sec:transform} \\
+    \texttt{02\_models.py}      & Nguyễn Thị Bích Ngọc & Mục~\ref{sec:candidates}--\ref{sec:sensitivity} \\
+    \texttt{03\_sampling.py}    & Nguyễn Thu Ngân & Mục~\ref{sec:mcmc}--\ref{sec:posterior} \\
+    \texttt{04\_conjugate.py}   & Nguyễn Thục Anh & Mục~\ref{sec:conjugate} \\
     \texttt{05\_evaluation.py}  & Nguyễn Hồng Phúc & Chương~\ref{sec:evaluation} \\
     \bottomrule
   \end{tabular}

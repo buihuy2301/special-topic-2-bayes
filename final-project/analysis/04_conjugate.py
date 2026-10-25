@@ -1,6 +1,6 @@
 # %% [markdown]
-# # 01_conjugate — Hậu nghiệm dạng đóng cho M1 (Normal–Inverse-Gamma), đối chiếu MCMC (mục 4.1)
-# Owner: TV1. Runs after 04_sampling (needs `idata_M1.nc`).
+# # 04_conjugate — Hậu nghiệm dạng đóng cho M1 (Normal–Inverse-Gamma), đối chiếu MCMC (mục 4.1)
+# Owner: Nguyễn Thục Anh. Runs after 03_sampling (needs `idata_M1.nc`).
 #
 # Prior: beta | sigma² ~ N(m0, sigma² V0), sigma² ~ IG(a0, b0). Posterior:
 #

@@ -54,9 +54,12 @@ htmlcov/
 # Tài liệu do AI sinh ra trong quá trình làm bài (rà soát, tổng hợp yêu cầu, đề cương)
 /requirement.md
 /review.md
-/cuoi-ky-nhom10/de-cuong-bao-cao.pdf
+/final-project/de-cuong-bao-cao.pdf
 CLAUDE.md
 .claude/
 
 # Kết quả MCMC (~120 MB), sinh lại bằng build_notebook.py
-/cuoi-ky-nhom10/outputs/idata/
+/final-project/outputs/idata/
+
+# File nén nộp bài, tạo từ các file đang theo dõi trong git
+/Nhom10_CuoiKy_HoiQuyBayes.zip
