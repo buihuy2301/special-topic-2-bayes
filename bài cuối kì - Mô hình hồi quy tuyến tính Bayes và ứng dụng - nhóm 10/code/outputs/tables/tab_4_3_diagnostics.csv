@@ -1,6 +1,0 @@
-model,max_r_hat,min_ess_bulk,min_ess_tail,divergences,pass
-M1,1.0,10830.0,5460.0,0,True
-M2,1.0,6013.0,5295.0,0,True
-M3,1.0,5618.0,5197.0,0,True
-M4,1.0,5116.0,5091.0,0,True
-M5,1.0,4626.0,4763.0,0,True
