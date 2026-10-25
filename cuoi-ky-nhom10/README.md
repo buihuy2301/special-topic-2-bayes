@@ -23,11 +23,11 @@ PyTensor không biên dịch được C trên toolchain macOS này (clang báo l
 
 | Module | Người phụ trách | Mục trong báo cáo | Đầu ra chính |
 | --- | --- | --- | --- |
-| `analysis/02_data_eda.py` | TV2 | Ch.2, 3.1–3.3, Q1 (scatterplot) | `data_clean.csv`, `fig_2_6_*`, `tab_3_2_vif.csv`, `tab_3_1_ols.csv` |
-| `analysis/03_models.py` | TV3 | 3.4–3.7 | `fig_3_6_prior_predictive.png`, `tab_3_7_sensitivity.csv` |
-| `analysis/04_sampling.py` | TV4 | 4.2–4.4 | `idata/idata_M1..M5.nc`, `tab_4_3_diagnostics.csv`, `tab_4_4_posterior.csv`, MH tự cài |
-| `analysis/01_conjugate.py` | TV1 | 4.1 | `tab_4_1_conjugate_vs_mcmc.csv`, `fig_4_1_conjugate.png` |
-| `analysis/05_evaluation.py` | TV5 | 5.1–5.6 (Q1–Q4) | `tab_5_*`, `fig_5_*` |
+| `analysis/02_data_eda.py` | Bùi Quang Huy | Ch.2, 3.1–3.3, Q1 (scatterplot) | `data_clean.csv`, `fig_2_6_*`, `tab_3_2_vif.csv`, `tab_3_1_ols.csv` |
+| `analysis/03_models.py` | Nguyễn Thị Bích Ngọc | 3.4–3.7 | `fig_3_6_prior_predictive.png`, `tab_3_7_sensitivity.csv` |
+| `analysis/04_sampling.py` | Nguyễn Thu Ngân | 4.2–4.4 | `idata/idata_M1..M5.nc`, `tab_4_3_diagnostics.csv`, `tab_4_4_posterior.csv`, MH tự cài |
+| `analysis/01_conjugate.py` | Nguyễn Thục Anh | 4.1 | `tab_4_1_conjugate_vs_mcmc.csv`, `fig_4_1_conjugate.png` |
+| `analysis/05_evaluation.py` | Nguyễn Hồng Phúc | 5.1–5.6 (Q1–Q4) | `tab_5_*`, `fig_5_*` |
 | `analysis/common.py` | chung | — | đường dẫn, seed, chuẩn hoá, định nghĩa M1–M5 |
 
 Mọi kết quả nằm trong `outputs/`: `figures/` (tên hình theo mục, ví dụ `fig_2_6_scatter.png`), `tables/` (CSV),

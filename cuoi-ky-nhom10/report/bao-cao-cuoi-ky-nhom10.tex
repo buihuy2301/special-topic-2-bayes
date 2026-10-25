@@ -343,8 +343,8 @@ cho M1 để kiểm chứng phần cài đặt.
 
 Phương pháp Monte Carlo theo xích Markov (MCMC) tạo ra một chuỗi giá trị tham số
 mà về lâu dài phân phối theo đúng hậu nghiệm; các mẫu này được dùng để tính
-trung bình, HDI và xác suất hậu nghiệm. Metropolis--Hastings bước ngẫu nhiên là
-dạng đơn giản nhất: mỗi bước đề xuất một điểm gần điểm hiện tại rồi chấp nhận
+trung bình, HDI và xác suất hậu nghiệm. Metropolis--Hastings bước ngẫu nhiên
+\cite{hastings1970} là dạng đơn giản nhất: mỗi bước đề xuất một điểm gần điểm hiện tại rồi chấp nhận
 hoặc từ chối. NUTS \cite{hoffman2014nuts} là một biến thể của Hamiltonian Monte
 Carlo. Thuật toán dùng gradient của logarit hậu nghiệm để đi những bước xa mà
 vẫn có xác suất chấp nhận cao, và tự chọn độ dài quỹ đạo thay vì để người dùng
@@ -1088,11 +1088,11 @@ module được ghi ở bảng~\ref{tab:modules}.
     \toprule
     Module & Phụ trách & Mục trong báo cáo \\
     \midrule
-    \texttt{02\_data\_eda.py}   & TV2 & Chương~\ref{sec:data}, mục~\ref{sec:transform} \\
-    \texttt{03\_models.py}      & TV3 & Mục~\ref{sec:candidates}--\ref{sec:sensitivity} \\
-    \texttt{04\_sampling.py}    & TV4 & Mục~\ref{sec:mcmc}--\ref{sec:posterior} \\
-    \texttt{01\_conjugate.py}   & TV1 & Mục~\ref{sec:conjugate} \\
-    \texttt{05\_evaluation.py}  & TV5 & Chương~\ref{sec:evaluation} \\
+    \texttt{02\_data\_eda.py}   & Bùi Quang Huy & Chương~\ref{sec:data}, mục~\ref{sec:transform} \\
+    \texttt{03\_models.py}      & Nguyễn Thị Bích Ngọc & Mục~\ref{sec:candidates}--\ref{sec:sensitivity} \\
+    \texttt{04\_sampling.py}    & Nguyễn Thu Ngân & Mục~\ref{sec:mcmc}--\ref{sec:posterior} \\
+    \texttt{01\_conjugate.py}   & Nguyễn Thục Anh & Mục~\ref{sec:conjugate} \\
+    \texttt{05\_evaluation.py}  & Nguyễn Hồng Phúc & Chương~\ref{sec:evaluation} \\
     \bottomrule
   \end{tabular}
 \end{table}
