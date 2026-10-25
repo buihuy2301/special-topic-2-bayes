@@ -39,8 +39,10 @@ latexmk -xelatex -e '$biber="~/bin/biber-arm64 %O %S"' bao-cao-cuoi-ky-nhom10.te
 
 - `bao-cao-cuoi-ky-nhom10.tex` đặt `\sharedir` (đường dẫn tới `shared/`), `\figdir` (thư mục hình PNG),
   rồi `\input{\sharedir/layout.tex}`; trang bìa in bằng `\makereporttitlepage`.
+- Trang bìa theo mẫu báo cáo môn Các phương pháp ngẫu nhiên (khung viền, tiêu đề in hoa, khối giảng viên/học viên).
 - Thông tin riêng của báo cáo khai báo đầu file `.tex`: `\reporttitle`, `\reportname`, `\studentlabel`,
-  `\studentname`. Thông tin chung cả môn ở `shared/meta.tex`: `\coursename` và `\teachername` (để trống thì
+  `\studentname` (mỗi dòng `Họ tên & MSSV`, các dòng cách nhau bằng `\\`). Thông tin chung cả môn ở
+  `shared/meta.tex`: `\coursetitle` (tên môn in trên bìa), `\coursename` (header) và `\teachername` (để trống thì
   khối giảng viên bị ẩn).
 - `\resultfig[tỉ lệ rộng]{tên file}{chú thích}{nhãn}` lấy `\figdir/<tên file>.png`; hình chưa sinh hiện
   thành khung trống ghi tên file, nên báo cáo vẫn biên dịch được.

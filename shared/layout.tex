@@ -125,51 +125,71 @@
 }
 
 % ============ TITLE PAGE ============
-% Reads \reporttitle, \reportname, \studentlabel, \studentname and
-% \teachername (left empty to drop the lecturer block), all set by the report.
+% Same cover as ../Các phương pháp ngẫu nhiên/final_report/report/main.tex:
+% framed page, bold uppercase headings, logo, then a label/value block for the
+% lecturer and students. Reads \coursetitle, \teachername (left empty to drop
+% the lecturer row), \reporttitle, \reportname, \studentlabel and \studentname. \studentname holds rows of "name & ID", separated by \\.
+\usepackage{tikz}
+\usetikzlibrary{calc}
+
 \newcommand{\makereporttitlepage}{%
+\newgeometry{left=3cm,right=2cm,top=2cm,bottom=2cm}
 \begin{titlepage}
-\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
 \centering
+\onehalfspacing
 
-\textsc{\LARGE đại học quốc gia hà nội}\\[1.5cm]
-\textsc{\Large trường đại học khoa học tự nhiên}\\[0.5cm]
-\textsc{\large khoa toán - cơ - tin học}\\[0.5cm]
-\textsc{\coursename}\\[0.5cm]
+\begin{tikzpicture}[remember picture, overlay]
+  \draw[line width=0.9pt]
+    ($(current page.north west)+(2.2cm,-2.0cm)$) rectangle
+    ($(current page.south east)+(-2.0cm,2.0cm)$);
+\end{tikzpicture}
 
-\HRule \\[0.4cm]
-{
-\huge{\bfseries{\reporttitle}}\\[0.5cm]
-\large{\bfseries{Đề tài: \reportname}}
-}\\[0.4cm]
-\HRule \\[0.5cm]
+\vspace*{0.5cm}
 
-\includegraphics[scale=.20]{logo-hus.jpg}\\[1cm]
+{\large\bfseries ĐẠI HỌC QUỐC GIA HÀ NỘI\par}
+\vspace{0.35cm}
+{\large\bfseries TRƯỜNG ĐẠI HỌC KHOA HỌC TỰ NHIÊN\par}
+\vspace{0.35cm}
+{\large\bfseries KHOA TOÁN - CƠ - TIN HỌC\par}
 
-\ifx\teachername\empty
-\begin{minipage}[t]{0.6\textwidth}
-\centering \large
-\emph{\studentlabel:}\\
-\studentname
-\end{minipage}\\[1cm]
+\vspace{0.9cm}
+
+\includegraphics[height=3.6cm]{logo-hus.jpg}
+
+\vspace{1.2cm}
+
+{\LARGE\bfseries \reporttitle\par}
+\vspace{0.6cm}
+% The course line keeps \Large unless it would run into the frame.
+\settowidth{\dimen0}{\Large\bfseries \MakeUppercase{\coursetitle}}%
+\ifdim\dimen0>0.92\textwidth
+  {\large\bfseries \MakeUppercase{\coursetitle}\par}
 \else
-\begin{minipage}[t]{0.4\textwidth}
-\begin{flushleft} \large
-\emph{\studentlabel:}\\
-\studentname
-\end{flushleft}
-\end{minipage}
-~
-\begin{minipage}[t]{0.4\textwidth}
-\begin{flushright} \large
-\emph{Giảng viên hướng dẫn:} \\
-\teachername
-\end{flushright}
-\end{minipage}\\[1cm]
+  {\Large\bfseries \MakeUppercase{\coursetitle}\par}
 \fi
 
-{\large \today}\\[1cm]
+\vspace{1.2cm}
+
+{\large\bfseries ĐỀ TÀI:\par}
+\vspace{0.35cm}
+{\large\bfseries \MakeUppercase{\reportname}\par}
 
 \vfill
+
+\begin{minipage}{0.82\textwidth}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{@{}p{4.5cm}@{}l@{}}
+\ifx\teachername\empty\else
+\textbf{Giảng viên:} & \teachername \\[0.3cm]
+\fi
+\textbf{\studentlabel:} &
+  \begin{tabular}[t]{@{}l@{\hspace{1.5cm}}l@{}}\studentname\end{tabular} \\
+\end{tabular}
+\end{minipage}
+
+\vfill
+{\large Hà Nội, tháng \the\month{} năm \the\year\par}
+\vspace{0.8cm}
 \end{titlepage}%
+\restoregeometry
 }
