@@ -25,21 +25,22 @@
 \chapter*{Tóm tắt}
 \addcontentsline{toc}{chapter}{Tóm tắt}
 
-Nhóm dùng hồi quy tuyến tính Bayes để giải thích và dự đoán hiệu suất nhiên liệu
+Báo cáo này áp dụng hồi quy tuyến tính Bayes để phân tích hiệu suất nhiên liệu
 trong thành phố (biến City, đơn vị MPG) của 93 mẫu xe mới bán tại Mỹ năm 1993,
-dựa trên công suất, trọng lượng và xuất xứ. Nhóm xây dựng năm mô hình, ước lượng
-bằng NUTS trong PyMC, kiểm tra hội tụ, so sánh bằng PSIS-LOO và WAIC, và đối
-chiếu với công thức hậu nghiệm Normal--Inverse-Gamma cho mô hình đơn giản nhất.
-Kết quả cho thấy trọng lượng là biến liên hệ mạnh nhất với City: khi thêm trọng
-lượng vào mô hình, hệ số của công suất gần như bằng 0, còn mỗi \SI{100}{kg} nặng
-hơn ứng với City thấp hơn 6{,}2\%. Chênh lệch City giữa xe Mỹ và xe nước ngoài
-cũng giảm nhiều khi có trọng lượng. Đây là liên hệ trên dữ liệu quan sát, không
-phải quan hệ nhân quả. Mô hình cuối dùng hàm hợp lý Student-t để giảm ảnh hưởng
-của vài xe cỡ nhỏ tiết kiệm bất thường. Với một xe Mỹ 300 hp nặng
-\SI{1681}{kg}, mô hình dự đoán trung vị City khoảng 16{,}6 MPG, khoảng dự đoán
-95\% từ 13{,}4 đến 20{,}6 MPG; ba xe thật gần 300 hp (có trong dữ liệu học) đều
-nằm trong khoảng này. Báo cáo gồm sáu chương, trong đó bốn chương chính ứng với
-bốn yêu cầu (i)--(iv) của đề.
+với các biến giải thích là công suất, trọng lượng và xuất xứ. Nhóm xây dựng năm
+mô hình và ước lượng bằng thuật toán NUTS trong PyMC. Sau khi kiểm tra hội tụ,
+các mô hình được so sánh bằng PSIS-LOO và WAIC. Riêng mô hình đơn giản nhất còn
+được đối chiếu với nghiệm giải tích từ tiên nghiệm liên hợp
+Normal--Inverse-Gamma.
+
+Trọng lượng là biến có liên hệ chặt nhất với City. Khi đưa trọng lượng vào mô
+hình, hệ số của công suất gần như bằng 0, trong khi mỗi \SI{100}{kg} tăng thêm
+ứng với City giảm khoảng 6{,}2\%. Chênh lệch giữa xe Mỹ và xe nước ngoài cũng
+thu hẹp đáng kể. Mô hình cuối cùng dùng hàm hợp lý Student-t nhằm hạn chế ảnh
+hưởng của một số xe cỡ nhỏ tiết kiệm nhiên liệu bất thường. Với một xe Mỹ 300 hp
+nặng \SI{1681}{kg}, trung vị dự đoán của City vào khoảng 16{,}6 MPG, khoảng dự
+đoán 95\% từ 13{,}4 đến 20{,}6 MPG. Giá trị thực tế của ba xe gần 300 hp trong
+mẫu đều rơi vào khoảng này.
 
 \tableofcontents
 \pagebreak
@@ -54,19 +55,21 @@ bốn yêu cầu (i)--(iv) của đề.
 
 \section{Bối cảnh}
 
-Thập niên 1990, ngành ô tô Mỹ làm ăn có lãi. Thu nhập tăng nên người mua chuộng
-xe lớn và mạnh hơn: xe thể thao, sedan cỡ lớn, xe van và SUV. Xe mạnh và nặng
-thường tốn nhiên liệu hơn, nên câu hỏi công suất và trọng lượng ảnh hưởng thế
-nào đến mức tiêu hao nhiên liệu có ý nghĩa với cả người mua lẫn nhà sản xuất. Bộ
-dữ liệu của đề cho phép trả lời câu hỏi này trên một mẫu ngẫu nhiên các xe bán
-ra năm 1993.
+Đầu thập niên 1990, thị trường ô tô Mỹ phát triển mạnh. Thu nhập tăng khiến
+người mua ưa chuộng các dòng xe lớn và mạnh như xe thể thao, sedan cỡ lớn, xe
+van và SUV. Những xe này thường tiêu tốn nhiều nhiên liệu hơn, vì vậy công suất
+và trọng lượng ảnh hưởng thế nào đến mức tiêu hao nhiên liệu là vấn đề được cả
+người tiêu dùng lẫn nhà sản xuất quan tâm. Bộ dữ liệu của đề bài, gồm một mẫu
+ngẫu nhiên các xe bán ra năm 1993, cho phép xem xét vấn đề này một cách định
+lượng.
 
 \section{Mục tiêu và câu hỏi nghiên cứu}
 
-Biến phản hồi chính là City, biến giải thích chính là Horsepower; Weight và USA
-được thêm dần qua năm mô hình. Bốn chương chính ứng với bốn yêu cầu (i)--(iv) của
-đề và trả lời bốn câu hỏi trong tài liệu đính kèm, như ở
-bảng~\ref{tab:questions}.
+Báo cáo lấy City làm biến phản hồi và Horsepower làm biến giải thích chính. Hai
+biến Weight và USA lần lượt được bổ sung qua năm mô hình. Các chương từ
+chương~\ref{sec:data} đến chương~\ref{sec:evaluation} tương ứng với bốn yêu cầu
+(i)--(iv) của đề. Bốn câu hỏi trong tài liệu đính kèm và cách nhóm trả lời được
+tóm tắt ở bảng~\ref{tab:questions}.
 
 \begin{table}[tp]
   \centering
@@ -93,14 +96,15 @@ bảng~\ref{tab:questions}.
 
 \section{Vì sao chọn cách tiếp cận Bayes}
 
-Với cách tiếp cận Bayes, mỗi hệ số có cả một phân phối hậu nghiệm chứ không chỉ
-một giá trị ước lượng. Nhờ vậy câu hỏi như ``xe Mỹ có kém tiết kiệm hơn không''
-được trả lời trực tiếp bằng một xác suất. Tiên nghiệm ít thông tin loại bỏ các
-giá trị vô lý, ví dụ City âm hoặc trên 80 MPG, nhưng vẫn để dữ liệu quyết định
-kết quả. Phân phối dự đoán hậu nghiệm tính đến cả việc chưa biết chắc tham số
-lẫn sai số của từng quan sát. Điều này đặc biệt cần cho câu hỏi Q4, vì điểm cần
-dự đoán nằm ở rìa dữ liệu. Phần lý thuyết dựa theo
-\cite{gelman2013bda, mcelreath2020rethinking}.
+Điểm mạnh của cách tiếp cận Bayes là mỗi hệ số được mô tả bằng cả một phân phối
+hậu nghiệm thay vì một giá trị ước lượng duy nhất. Nhờ đó, những câu hỏi như
+``xe Mỹ có kém tiết kiệm nhiên liệu hơn không'' có thể trả lời trực tiếp bằng
+một xác suất. Tiên nghiệm ít thông tin giúp loại bỏ các giá trị phi thực tế
+(chẳng hạn City âm hoặc vượt 80 MPG) mà không lấn át thông tin từ dữ liệu. Ngoài
+ra, phân phối dự đoán hậu nghiệm phản ánh đồng thời độ bất định của tham số và
+sai số của từng quan sát. Điều này đặc biệt quan trọng với câu hỏi Q4, khi điểm
+cần dự đoán nằm ở biên của dữ liệu. Phần lý thuyết trong báo cáo chủ yếu tham
+khảo \cite{gelman2013bda, mcelreath2020rethinking}.
 
 % ===========================================================================
 \chapter{Dữ liệu sử dụng}
@@ -108,15 +112,15 @@ dự đoán nằm ở rìa dữ liệu. Phần lý thuyết dựa theo
 
 \section{Nguồn và cách lấy mẫu}
 
-Bộ dữ liệu gồm 93 mẫu xe mới bán tại Mỹ năm 1993, lấy ngẫu nhiên từ
-\emph{The 1993 Cars -- Annual Auto Issue} của Consumer Reports
-\cite{consumerreports1993} và \emph{PACE New Car \& Truck 1993 Buying Guide}
-\cite{pace1993}. Mỗi dòng là một mẫu xe.
+Bộ dữ liệu gồm 93 mẫu xe mới bán tại Mỹ năm 1993, mỗi dòng ứng với một mẫu xe.
+Các xe được chọn ngẫu nhiên từ \emph{The 1993 Cars -- Annual Auto Issue} của
+Consumer Reports \cite{consumerreports1993} và \emph{PACE New Car \& Truck 1993
+Buying Guide} \cite{pace1993}.
 
 \section{Danh sách biến}
 
-File có 25 cột gồm tên xe, 20 biến liên tục và 4 biến mã hoá, như ở
-bảng~\ref{tab:variables}. Bốn biến dùng trong mô hình được in đậm.
+File dữ liệu có 25 cột, gồm tên xe, 20 biến liên tục và 4 biến mã hoá
+(bảng~\ref{tab:variables}). Bốn biến được dùng trong mô hình được in đậm.
 
 \begin{table}[tp]
   \centering
@@ -141,44 +145,48 @@ bảng~\ref{tab:variables}. Bốn biến dùng trong mô hình được in đậ
 \section{Làm sạch dữ liệu}
 \label{sec:cleaning}
 
-Dấu \texttt{*} trong file gốc được đổi thành giá trị thiếu. Luggage capacity
-thiếu 11 dòng (9 xe van cùng Chevrolet Corvette và Mazda RX-7), rear seat room
-thiếu 2 dòng (Corvette, RX-7), Cylinders thiếu 1 dòng (RX-7, xe này dùng động cơ
-rotary nên không có xi-lanh theo nghĩa thông thường). Hai cột RPM được lưu dạng
-chuỗi có dấu phẩy ngăn cách hàng nghìn, ví dụ ``6,300'', nên được chuyển sang
-số. Bốn biến của mô hình là City, Horsepower, Weight và USA không thiếu giá trị
-nào, nên giữ lại cả 93 dòng; kết quả lưu trong \texttt{data\_clean.csv}.
+Các ô đánh dấu \texttt{*} trong file gốc được chuyển thành giá trị thiếu. Biến
+Luggage capacity thiếu 11 dòng (9 xe van, Chevrolet Corvette và Mazda RX-7),
+Rear seat room thiếu 2 dòng (Corvette và RX-7), còn Cylinders thiếu 1 dòng ở
+RX-7 do xe này dùng động cơ rotary, không có xi-lanh theo nghĩa thông thường.
+Hai cột RPM được lưu dưới dạng chuỗi có dấu phẩy phân cách hàng nghìn (ví dụ
+``6,300'') nên cần chuyển sang dạng số. Do bốn biến dùng trong mô hình (City,
+Horsepower, Weight và USA) không thiếu giá trị nào, toàn bộ 93 dòng được giữ lại
+và lưu vào \texttt{data\_clean.csv}.
 
 \section{Đơn vị nhiên liệu}
 \label{sec:units}
 
-Tiêu đề cột ghi ``km/100L'' còn tài liệu đi kèm ghi ``litres per 100km'', hai
-đơn vị này ngược nhau. Giá trị chạy từ 15 đến 46, và xe nhỏ nhẹ nhất là Geo
-Metro (55 hp, \SI{769}{kg}) lại có giá trị cao nhất, nên cả hai cách ghi đều
-không hợp lý. Để xác định đơn vị, nhóm so từng dòng với bộ dữ liệu gốc
-\texttt{Cars93} trong gói R \texttt{MASS} \cite{lock1993cars, mass2002cars93}, bộ
-này có cùng 93 mẫu xe theo cùng thứ tự. Kết quả:
+Tiêu đề cột ghi đơn vị ``km/100L'', còn tài liệu đi kèm lại ghi ``litres per
+100km'', hai cách ghi mang ý nghĩa ngược nhau. Tuy nhiên, cả hai đều không khớp
+với dữ liệu. Các giá trị chỉ dao động từ 15 đến 46, và Geo Metro, xe nhỏ nhẹ
+nhất mẫu (55 hp, \SI{769}{kg}), lại có giá trị cao nhất. Để xác định đúng đơn
+vị, nhóm đối chiếu từng dòng với bộ dữ liệu \texttt{Cars93} trong gói R
+\texttt{MASS} \cite{lock1993cars, mass2002cars93}, vốn có cùng 93 mẫu xe theo
+đúng thứ tự. Kết quả đối chiếu như sau.
 
 \begin{itemize}
-  \item City trùng khớp cả 93 dòng với \texttt{MPG.city}, Open Road trùng khớp
-    với \texttt{MPG.highway}; tài liệu của \texttt{MASS} ghi rõ hai biến này là
-    dặm trên gallon Mỹ theo xếp hạng EPA;
-  \item Horsepower trùng khớp cả 93 dòng, còn Weight bằng \texttt{Weight} (pound)
-    nhân $0{,}4536$, sai lệch không quá \SI{0.5}{kg} do làm tròn. Ví dụ Acura
-    Integra: City 25, Open Road 31, 140 hp, \SI{1227}{kg} so với 25, 31, 140 hp
-    và 2705 lb.
+  \item City khớp hoàn toàn với \texttt{MPG.city} ở cả 93 dòng, Open Road khớp
+    với \texttt{MPG.highway}. Theo tài liệu của \texttt{MASS}, hai biến này có
+    đơn vị dặm trên gallon Mỹ theo xếp hạng của EPA.
+  \item Horsepower cũng khớp ở cả 93 dòng, còn Weight bằng \texttt{Weight}
+    (pound) nhân với $0{,}4536$, sai lệch không quá \SI{0.5}{kg} do làm tròn.
+    Chẳng hạn, Acura Integra có City 25, Open Road 31, 140 hp và \SI{1227}{kg},
+    so với 25, 31, 140 hp và 2705 lb trong \texttt{Cars93}.
 \end{itemize}
 
-Vậy bản Q\_10 là \texttt{Cars93} đã đổi một số cột sang hệ mét, nhưng giữ nguyên
-hai cột nhiên liệu và ghi nhầm đơn vị. Từ đây báo cáo dùng MPG (dặm trên gallon,
-càng cao càng tiết kiệm). Nếu cần đổi đơn vị thì
+Như vậy, bộ Q\_10 thực chất là \texttt{Cars93} với một số cột đã đổi sang hệ
+mét, riêng hai cột nhiên liệu vẫn giữ nguyên giá trị nhưng bị ghi sai đơn vị. Từ
+đây trở đi, báo cáo dùng đơn vị MPG (dặm trên gallon, giá trị càng cao thì xe
+càng tiết kiệm). Có thể quy đổi sang lít trên 100 km theo công thức
 $\text{L/100km} = 235{,}2 / \text{MPG}$.
 
 \section{Thống kê mô tả}
 
-Mẫu có 48 xe Mỹ và 45 xe nước ngoài. Công suất từ 55 đến 300 hp, trung vị 140;
-City từ 15 đến 46 MPG, trung vị 21 (bảng~\ref{tab:describe}). Hệ số tương quan
-giữa HP và City là $-0{,}67$, giữa City và Open Road là $0{,}94$.
+Mẫu gồm 48 xe Mỹ và 45 xe nước ngoài. Công suất dao động từ 55 đến 300 hp
+(trung vị 140), City từ 15 đến 46 MPG (trung vị 21), chi tiết ở
+bảng~\ref{tab:describe}. HP và City có hệ số tương quan $-0{,}67$, còn City và
+Open Road tương quan tới $0{,}94$.
 
 \begin{table}[tp]
   \centering
@@ -198,30 +206,33 @@ giữa HP và City là $-0{,}67$, giữa City và Open Road là $0{,}94$.
   \end{tabular}
 \end{table}
 
-Chia theo xuất xứ, xe Mỹ nặng hơn (trung bình \SI{1449}{kg} so với
-\SI{1335}{kg}), máy lớn hơn (\SI{3.1}{L} so với \SI{2.2}{L}) và kém tiết kiệm hơn
-(City \num{21.0} so với \num{23.9} MPG), trong khi công suất trung bình gần bằng
-nhau (\num{147.5} so với \num{139.9} hp). Vì vậy chênh lệch City giữa hai nhóm có
-thể do trọng lượng chứ chưa chắc do công suất; mục~\ref{sec:q2} sẽ kiểm tra điều
-này.
+So với xe nước ngoài, xe Mỹ trung bình nặng hơn (\SI{1449}{kg} so với
+\SI{1335}{kg}), dung tích động cơ lớn hơn (\SI{3.1}{L} so với \SI{2.2}{L}) và kém
+tiết kiệm nhiên liệu hơn (City \num{21.0} so với \num{23.9} MPG), dù công suất
+trung bình của hai nhóm khá gần nhau (\num{147.5} so với \num{139.9} hp). Điều
+này gợi ý rằng chênh lệch City giữa hai nhóm có thể đến từ trọng lượng nhiều hơn
+là từ công suất. Giả thuyết này được kiểm tra ở mục~\ref{sec:q2}.
 
 \section{Phân tích khám phá}
 \label{sec:eda}
 
-Ma trận biểu đồ phân tán ở hình~\ref{fig:scatter} cho thấy City giảm theo HP,
-Weight và Engine Size theo dạng cong: giảm nhanh ở nhóm xe nhỏ và chậm lại ở nhóm
-xe lớn. Xe nước ngoài tập trung ở vùng nhẹ, máy nhỏ, City cao; xe Mỹ nặng hơn và
-máy lớn hơn. City và Open Road gần như nằm trên một đường thẳng, nên hai biến
-nhiều khả năng có xu hướng giống nhau; báo cáo chỉ xây dựng mô hình cho City.
+Ma trận biểu đồ phân tán (hình~\ref{fig:scatter}) cho thấy City giảm khi HP,
+Weight và Engine Size tăng, nhưng không theo đường thẳng. Mức giảm nhanh ở nhóm
+xe nhỏ rồi chậm dần ở nhóm xe lớn. Xe nước ngoài tập trung ở vùng xe nhẹ, động
+cơ nhỏ và City cao, trong khi xe Mỹ thường nặng hơn và có động cơ lớn hơn. Các
+điểm của City và Open Road gần như nằm trên một đường thẳng, nên hai biến này
+nhiều khả năng biến động theo cùng một xu hướng. Vì vậy, báo cáo chỉ xây dựng mô
+hình cho City.
 
 \resultfig[0.95]{fig_2_6_scatter}{Ma trận biểu đồ phân tán các biến chính, tô màu
   theo xuất xứ.}{fig:scatter}
 
-Theo loại xe (hình~\ref{fig:box-type}), nhóm Small tiết kiệm nhất, còn Van và
-Large tốn nhiên liệu nhất. Một hồi quy OLS sơ bộ $\log(\City) \sim \HP$ cho thấy
-năm xe có phần dư studentised vượt $\pm 2$: Honda Civic ($+3{,}6$), Geo Metro
-($+3{,}2$), Suzuki Swift ($+2{,}4$), Ford Aerostar ($-2{,}4$) và Volkswagen
-Eurovan ($-2{,}3$). Mục~\ref{sec:q3} xét lại các xe này với mô hình đầy đủ.
+Xét theo loại xe (hình~\ref{fig:box-type}), nhóm Small tiết kiệm nhiên liệu
+nhất, còn Van và Large tốn nhiên liệu nhất. Khi chạy thử hồi quy OLS
+$\log(\City) \sim \HP$, có năm xe có phần dư studentised vượt ngưỡng $\pm 2$,
+gồm Honda Civic ($+3{,}6$), Geo Metro ($+3{,}2$), Suzuki Swift ($+2{,}4$), Ford
+Aerostar ($-2{,}4$) và Volkswagen Eurovan ($-2{,}3$). Các xe này sẽ được xem xét
+lại với mô hình đầy đủ ở mục~\ref{sec:q3}.
 
 \resultfig[0.75]{fig_2_6_box_type}{City theo loại xe; điểm tô màu theo xuất
   xứ.}{fig:box-type}
@@ -232,8 +243,8 @@ Eurovan ($-2{,}3$). Mục~\ref{sec:q3} xét lại các xe này với mô hình �
 
 \section{Cơ sở lý thuyết hồi quy tuyến tính}
 
-Mô hình hồi quy tuyến tính biểu diễn biến phản hồi qua các biến giải thích và một
-sai số ngẫu nhiên:
+Hồi quy tuyến tính mô tả biến phản hồi như một hàm tuyến tính của các biến giải
+thích cộng với một sai số ngẫu nhiên:
 %
 \begin{equation}
   \label{eq:linreg}
@@ -241,28 +252,29 @@ sai số ngẫu nhiên:
   \qquad \varepsilon_i \sim \N(0, \sigma^2).
 \end{equation}
 %
-Mô hình giả định quan hệ là tuyến tính (sau khi biến đổi biến nếu cần), các sai
-số độc lập, cùng phương sai và có phân phối chuẩn. Biến giả $\USA$ bằng 1 với xe
-Mỹ và 0 với xe nước ngoài, nên hệ số của nó là chênh lệch hệ số chặn giữa hai
-nhóm. Số hạng tương tác $\HP \times \USA$ cho phép hệ số góc theo HP khác nhau
-giữa hai nhóm. Khi hai biến giải thích tương quan mạnh, hệ số của chúng không ổn
-định và khó diễn giải riêng; hiện tượng đa cộng tuyến này được đo bằng hệ số
-phóng đại phương sai VIF.
+Mô hình dựa trên các giả định: quan hệ tuyến tính (có thể sau khi biến đổi
+biến), các sai số độc lập, có phương sai không đổi và tuân theo phân phối chuẩn.
+Biến giả $\USA$ nhận giá trị 1 với xe Mỹ và 0 với xe nước ngoài, do đó hệ số của
+nó chính là chênh lệch hệ số chặn giữa hai nhóm. Số hạng tương tác
+$\HP \times \USA$ cho phép độ dốc theo HP khác nhau giữa hai nhóm. Khi các biến
+giải thích tương quan mạnh với nhau, ước lượng hệ số trở nên kém ổn định và khó
+diễn giải riêng lẻ. Hiện tượng này gọi là đa cộng tuyến và thường được đo bằng
+hệ số phóng đại phương sai (VIF).
 
-Phương pháp bình phương tối thiểu (OLS) cho một giá trị ước lượng và một khoảng
-tin cậy theo tần suất, còn cách tiếp cận Bayes cho cả phân phối hậu nghiệm của
-mỗi hệ số. Với tiên nghiệm ít thông tin, trung bình hậu nghiệm gần bằng ước
-lượng OLS; ví dụ hệ số $\beta_{\HP}$ của M3 là $-0{,}860$ theo OLS và $-0{,}859$
-theo Bayes.
+Phương pháp bình phương tối thiểu (OLS) cho ra một ước lượng điểm kèm khoảng tin
+cậy theo quan điểm tần suất. Trong khi đó, cách tiếp cận Bayes cho ra toàn bộ
+phân phối hậu nghiệm của từng hệ số. Khi dùng tiên nghiệm ít thông tin, trung
+bình hậu nghiệm thường rất gần ước lượng OLS. Ví dụ, hệ số $\beta_{\HP}$ của M3
+bằng $-0{,}860$ theo OLS và $-0{,}859$ theo Bayes.
 
 \section{Chọn biến}
 
-City là biến phản hồi và HP là biến giải thích chính, đúng với câu hỏi Q4.
-Weight và Engine Size tương quan mạnh với HP (\num{0.74} và \num{0.73}) và với
-nhau (\num{0.85}), nên nhóm tính VIF trước khi đưa cả ba vào
-(bảng~\ref{tab:vif}). Mọi VIF đều dưới 5, nhưng Engine Size gần như lặp lại thông
-tin của Weight, nên nhóm chỉ giữ Weight. Với bộ biến của M4, VIF lớn nhất là
-\num{2.34}.
+City được chọn làm biến phản hồi và HP làm biến giải thích chính, đúng như yêu
+cầu của câu hỏi Q4. Weight và Engine Size đều tương quan mạnh với HP (lần lượt
+\num{0.74} và \num{0.73}) và với nhau (\num{0.85}), vì vậy nhóm tính VIF trước
+khi đưa cả ba biến vào mô hình (bảng~\ref{tab:vif}). Tuy tất cả VIF đều nhỏ hơn
+5, Engine Size gần như không bổ sung thêm thông tin so với Weight nên chỉ Weight
+được giữ lại. Với bộ biến của M4, VIF lớn nhất chỉ là \num{2.34}.
 
 \begin{table}[tp]
   \centering
@@ -283,12 +295,13 @@ tin của Weight, nên nhóm chỉ giữ Weight. Với bộ biến của M4, VIF
 \section{Biến đổi biến}
 \label{sec:transform}
 
-Quan hệ giữa City và HP có dạng cong, nên nhóm so sánh hai cách: hồi quy OLS City
-theo HP và hồi quy $\log(\City)$ theo HP. Để so được hai mô hình, logarit hàm hợp
-lý của mô hình logarit được tính lại trên thang City bằng cách cộng thêm Jacobian
-$-\sum_i \log \City_i$. Theo bảng~\ref{tab:transform}, $\log(\City)$ khớp tốt hơn
-rõ rệt, AIC thấp hơn 36 đơn vị, và đường làm trơn của phần dư ở
-hình~\ref{fig:transform} không còn dạng cong.
+Do quan hệ giữa City và HP có dạng cong, nhóm so sánh hai phương án: hồi quy OLS
+của City theo HP và của $\log(\City)$ theo HP. Để hai mô hình so sánh được với
+nhau, logarit hàm hợp lý của mô hình logarit được quy về thang City bằng cách
+cộng thêm số hạng Jacobian $-\sum_i \log \City_i$. Kết quả ở
+bảng~\ref{tab:transform} cho thấy $\log(\City)$ khớp dữ liệu tốt hơn hẳn, với
+AIC thấp hơn 36 đơn vị. Đường làm trơn phần dư ở hình~\ref{fig:transform} cũng
+không còn dạng cong.
 
 \begin{table}[tp]
   \centering
@@ -309,19 +322,21 @@ hình~\ref{fig:transform} không còn dạng cong.
   và $\log(\City)$ làm biến phản hồi; đường cam là đường làm trơn
   LOWESS.}{fig:transform}
 
-Vì vậy mọi mô hình đều dùng $y = \log(\City)$ đã chuẩn hoá. HP và Weight được
-chuẩn hoá bằng cách trừ trung bình và chia độ lệch chuẩn mẫu, còn USA giữ nguyên
-0/1. Chuẩn hoá giúp đặt tiên nghiệm dễ hơn vì mọi hệ số cùng một thang, và giúp
-MCMC hội tụ tốt hơn. Kết quả cuối được đổi ngược về MPG bằng
-$\City = \exp(\bar{\ell} + s_\ell\, y)$, trong đó $\bar{\ell}$ và $s_\ell$ là
-trung bình và độ lệch chuẩn của $\log(\City)$ trong mẫu.
+Do đó, tất cả các mô hình đều dùng biến phản hồi $y = \log(\City)$ đã chuẩn hoá.
+HP và Weight cũng được chuẩn hoá (trừ trung bình, chia độ lệch chuẩn mẫu), còn
+USA giữ nguyên dạng 0/1. Việc chuẩn hoá đưa các hệ số về cùng một thang, giúp
+đặt tiên nghiệm thuận tiện hơn và cải thiện khả năng hội tụ của MCMC. Kết quả
+cuối cùng được chuyển ngược về MPG theo công thức
+$\City = \exp(\bar{\ell} + s_\ell\, y)$, với $\bar{\ell}$ và $s_\ell$ là trung
+bình và độ lệch chuẩn mẫu của $\log(\City)$.
 
 \section{Năm mô hình ứng viên}
 \label{sec:candidates}
 
-Năm mô hình ở bảng~\ref{tab:models} thêm dần biến giải thích. M5 dùng cùng bộ
-biến với M4, mô hình tốt nhất trong M1--M4 theo PSIS-LOO, nhưng thay hàm hợp lý
-chuẩn bằng Student-t để giảm ảnh hưởng của điểm ngoại lai.
+Năm mô hình ứng viên (bảng~\ref{tab:models}) được xây dựng bằng cách bổ sung dần
+các biến giải thích. M4 là mô hình tốt nhất trong nhóm M1--M4 theo PSIS-LOO. M5
+giữ nguyên bộ biến của M4 nhưng thay hàm hợp lý chuẩn bằng phân phối Student-t
+để giảm ảnh hưởng của các điểm ngoại lai.
 
 \begin{table}[tp]
   \centering
@@ -355,21 +370,24 @@ Trên thang đã chuẩn hoá, M3 có dạng
   \end{aligned}
 \end{equation}
 %
-Các mô hình khác bỏ bớt hoặc thay số hạng trong $\mu_i$. M5 thay hàm hợp lý chuẩn
-bằng $y_i \sim t_\nu(\mu_i, \sigma)$ với $\nu \sim \text{Gamma}(2;\, 0{,}1)$, cho
-phép phân phối có đuôi dày hơn khi dữ liệu có điểm ngoại lai. Tiên nghiệm này có
-trung bình 20 nhưng vẫn cho xác suất đáng kể với các giá trị $\nu$ nhỏ.
+Các mô hình còn lại được suy ra bằng cách bớt hoặc thay đổi các số hạng trong
+$\mu_i$. Riêng M5 dùng hàm hợp lý $y_i \sim t_\nu(\mu_i, \sigma)$ với
+$\nu \sim \text{Gamma}(2;\, 0{,}1)$, cho phép phân phối có đuôi dày hơn để thích
+ứng với các điểm ngoại lai. Tiên nghiệm Gamma này có trung bình bằng 20, song
+vẫn dành xác suất đáng kể cho các giá trị $\nu$ nhỏ.
 
 \section{Chọn tiên nghiệm và kiểm tra dự đoán tiên nghiệm}
 \label{sec:priors}
 
-Nhóm so sánh ba tiên nghiệm cho các hệ số: tiên nghiệm phẳng $\N(0, 100^2)$, tiên
-nghiệm ít thông tin $\N(0, 2{,}5^2)$ và tiên nghiệm hẹp $\N(0, 0{,}5^2)$. Tiên
-nghiệm liên hợp Normal--Inverse-Gamma cho công thức hậu nghiệm ở
-mục~\ref{sec:conjugate}; còn các tiên nghiệm độc lập trong \eqref{eq:m3} không
-liên hợp nên phải dùng MCMC. Để kiểm tra, nhóm sinh \num{1000} bộ dữ liệu từ tiên
-nghiệm của M3 và đếm tỉ lệ City nằm trong miền hợp lý. Vì mô hình đặt trên thang
-logarit nên City luôn dương, điều kiện còn lại là City không quá 80 MPG.
+Nhóm thử ba lựa chọn tiên nghiệm cho các hệ số: tiên nghiệm phẳng
+$\N(0, 100^2)$, tiên nghiệm ít thông tin $\N(0, 2{,}5^2)$ và tiên nghiệm hẹp
+$\N(0, 0{,}5^2)$. Tiên nghiệm liên hợp Normal--Inverse-Gamma cho phép tính hậu
+nghiệm dưới dạng đóng (mục~\ref{sec:conjugate}), nhưng các tiên nghiệm độc lập
+trong \eqref{eq:m3} không có tính liên hợp nên cần dùng MCMC. Để đánh giá từng
+tiên nghiệm, nhóm sinh \num{1000} bộ dữ liệu từ phân phối tiên nghiệm của M3 rồi
+tính tỉ lệ giá trị City nằm trong miền hợp lý. Vì mô hình được xây dựng trên
+thang logarit nên City luôn dương, chỉ cần kiểm tra thêm điều kiện City không
+vượt quá 80 MPG.
 
 \begin{table}[tp]
   \centering
@@ -387,12 +405,12 @@ logarit nên City luôn dương, điều kiện còn lại là City không quá 
   \end{tabular}
 \end{table}
 
-Theo bảng~\ref{tab:prior-pred} và hình~\ref{fig:prior-pred}, tiên nghiệm phẳng
-sinh ra phần lớn giá trị vô lý, chỉ 3{,}4\% mô phỏng nằm trong khoảng 5--80 MPG.
-Tiên nghiệm ít thông tin giữ 86\% mô phỏng trong khoảng đó mà vẫn đủ rộng để
-không ép kết quả, nên được chọn làm tiên nghiệm chính. Tiên nghiệm hẹp cho giá
-trị hợp lý nhưng có thể kéo hệ số về 0; mục~\ref{sec:sensitivity} kiểm tra điều
-này.
+Bảng~\ref{tab:prior-pred} và hình~\ref{fig:prior-pred} cho thấy tiên nghiệm
+phẳng sinh ra phần lớn các giá trị phi thực tế, chỉ 3{,}4\% số lần mô phỏng cho
+City trong khoảng 5--80 MPG. Với tiên nghiệm ít thông tin, tỉ lệ này là 86\%,
+trong khi tiên nghiệm vẫn đủ rộng để không áp đặt kết quả. Đây là tiên nghiệm
+được chọn cho các mô hình chính. Tiên nghiệm hẹp cũng cho giá trị hợp lý nhưng có
+nguy cơ kéo các hệ số về 0, vấn đề này được xem xét ở mục~\ref{sec:sensitivity}.
 
 \resultfig[0.7]{fig_3_6_prior_predictive}{Phân phối City mô phỏng từ tiên nghiệm
   của M3 với ba tiên nghiệm, so với dữ liệu thật; trục hoành theo thang logarit,
@@ -401,13 +419,14 @@ này.
 \section{Ảnh hưởng của tiên nghiệm đến kết quả}
 \label{sec:sensitivity}
 
-Nhóm chạy lại M3 với cả ba tiên nghiệm. Tiên nghiệm phẳng và tiên nghiệm ít
-thông tin cho hậu nghiệm gần như trùng nhau, trung bình lệch nhau nhiều nhất
-\num{0.04} độ lệch chuẩn hậu nghiệm, tức kết quả do dữ liệu quyết định. Tiên
-nghiệm hẹp kéo các hệ số về 0 nhiều nhất \num{0.42} độ lệch chuẩn hậu nghiệm, rõ
-nhất ở tương tác $\HP \times \USA$: hệ số này giảm từ \num{0.294} xuống
-\num{0.239} và HDI 95\% bắt đầu chứa 0 (hình~\ref{fig:sensitivity}). Vì vậy kết
-luận về tương tác ở mục~\ref{sec:q2} cần nói thận trọng.
+Để đánh giá độ nhạy, M3 được ước lượng lại với cả ba tiên nghiệm. Hậu nghiệm
+dưới tiên nghiệm phẳng và tiên nghiệm ít thông tin gần như trùng nhau, trung bình
+chênh lệch tối đa \num{0.04} độ lệch chuẩn hậu nghiệm, nghĩa là kết quả hầu như
+chỉ phụ thuộc vào dữ liệu. Tiên nghiệm hẹp kéo các hệ số về 0, mạnh nhất tới
+\num{0.42} độ lệch chuẩn hậu nghiệm. Ảnh hưởng này thấy rõ nhất ở hệ số tương tác
+$\HP \times \USA$, giảm từ \num{0.294} xuống \num{0.239}, và HDI 95\% lúc này đã
+chứa 0 (hình~\ref{fig:sensitivity}). Do đó, kết luận về tương tác ở
+mục~\ref{sec:q2} cần được diễn giải thận trọng.
 
 \resultfig[0.7]{fig_3_7_sensitivity}{Hậu nghiệm của M3 với ba tiên nghiệm, trung
   bình và HDI 95\%.}{fig:sensitivity}
@@ -419,7 +438,8 @@ luận về tương tác ở mục~\ref{sec:q2} cần nói thận trọng.
 \section{Công thức hậu nghiệm cho M1}
 \label{sec:conjugate}
 
-Theo định lý Bayes, hậu nghiệm tỉ lệ với tích của hàm hợp lý và tiên nghiệm:
+Theo định lý Bayes, phân phối hậu nghiệm tỉ lệ với tích của hàm hợp lý và tiên
+nghiệm:
 %
 \begin{equation}
   \label{eq:bayes}
@@ -440,17 +460,17 @@ dạng với các tham số
   \end{aligned}
 \end{equation}
 %
-Lấy tích phân theo $\sigma^2$ ta được phân phối biên của $\beta$ là phân phối $t$
-nhiều chiều với $2a_n$ bậc tự do, tâm $m_n$ và ma trận tỉ lệ $(b_n / a_n) V_n$
-\cite{gelman2013bda}. Nhóm chọn $m_0 = 0$, $V_0 = 2{,}5^2 I$, $a_0 = 2$,
-$b_0 = 1$ và tính được $a_n = 48{,}5$, $b_n = 23{,}76$.
+Lấy tích phân theo $\sigma^2$, phân phối biên của $\beta$ là phân phối $t$ nhiều
+chiều với $2a_n$ bậc tự do, tâm $m_n$ và ma trận tỉ lệ $(b_n / a_n) V_n$
+\cite{gelman2013bda}. Với lựa chọn $m_0 = 0$, $V_0 = 2{,}5^2 I$, $a_0 = 2$ và
+$b_0 = 1$, ta tính được $a_n = 48{,}5$ và $b_n = 23{,}76$.
 
-Để kiểm tra code, nhóm viết lại đúng tiên nghiệm này trong PyMC và lấy mẫu bằng
-NUTS. Bảng~\ref{tab:conjugate} cho thấy hai kết quả khớp đến chữ số thập phân thứ
-ba; nếu lệch nhau thì code có lỗi. Dòng thứ ba dùng tiên nghiệm ít thông tin độc
-lập của M1, khác tiên nghiệm liên hợp, nhưng hậu nghiệm vẫn gần như trùng, vì cả
-hai tiên nghiệm đều rộng và 93 quan sát đủ để dữ liệu quyết định kết quả
-(hình~\ref{fig:conjugate}).
+Để kiểm chứng phần cài đặt, nhóm khai báo lại đúng tiên nghiệm này trong PyMC và
+lấy mẫu bằng NUTS. Như bảng~\ref{tab:conjugate} cho thấy, hai cách tính cho kết
+quả trùng nhau đến chữ số thập phân thứ ba. Dòng cuối của bảng dùng tiên nghiệm
+ít thông tin độc lập của M1 thay cho tiên nghiệm liên hợp. Dù vậy, hậu nghiệm gần
+như không đổi, do cả hai tiên nghiệm đều rộng và 93 quan sát đã đủ để dữ liệu chi
+phối kết quả (hình~\ref{fig:conjugate}).
 
 \begin{table}[tp]
   \centering
@@ -475,35 +495,38 @@ hai tiên nghiệm đều rộng và 93 quan sát đủ để dữ liệu quyế
 \section{Lấy mẫu MCMC}
 \label{sec:mcmc}
 
-M2--M5 không có công thức hậu nghiệm nên được lấy mẫu bằng NUTS
-\cite{hoffman2014nuts} trong PyMC 5.28 \cite{abrilpla2023pymc}, với 4 chuỗi, mỗi
-chuỗi \num{2000} vòng sau \num{1000} vòng khởi động, seed cố định 2026. NUTS là
-một dạng của Hamiltonian Monte Carlo: nó dùng gradient của logarit hậu nghiệm để
-đề xuất các bước đi xa mà vẫn có xác suất chấp nhận cao, và tự chọn độ dài bước
-thay vì để người dùng chỉnh tay.
+Với M2--M5, hậu nghiệm không có dạng đóng nên được lấy mẫu bằng NUTS
+\cite{hoffman2014nuts} trong PyMC 5.28 \cite{abrilpla2023pymc}. Mỗi mô hình chạy
+4 chuỗi, mỗi chuỗi \num{2000} vòng lặp sau \num{1000} vòng khởi động, với seed cố
+định là 2026. NUTS là một biến thể của Hamiltonian Monte Carlo. Thuật toán dùng
+gradient của logarit hậu nghiệm để đề xuất những bước di chuyển xa nhưng vẫn giữ
+xác suất chấp nhận cao, đồng thời tự điều chỉnh độ dài quỹ đạo thay vì để người
+dùng tinh chỉnh thủ công.
 
-Để thấy sự khác biệt, nhóm tự viết thuật toán Metropolis--Hastings bước ngẫu
-nhiên cho M1. Thuật toán lấy mẫu trên $(\beta_0, \beta_1, \log\sigma)$, cộng thêm
-Jacobian $\log\sigma$ vào logarit hậu nghiệm, bước đề xuất có phân phối chuẩn với
-độ lệch chuẩn \num{0.08}, chạy 4 chuỗi \num{6000} vòng và bỏ \num{1000} vòng đầu.
-Tỉ lệ chấp nhận từ \num{0.41} đến \num{0.43}. Metropolis--Hastings cho cùng hậu
-nghiệm với NUTS ($\beta_{\HP} = -0{,}708$ so với $-0{,}710$) nhưng kém hiệu quả
-hơn nhiều: cỡ mẫu hiệu dụng khoảng \num{1700} từ \num{20000} mẫu, trong khi NUTS
-đạt khoảng \num{12000} từ \num{8000} mẫu. Lý do là mỗi bước của
-Metropolis--Hastings chỉ dịch đi một đoạn ngắn, nên các mẫu liên tiếp tương quan
-mạnh (hình~\ref{fig:mh}).
+Để so sánh, nhóm tự cài đặt thuật toán Metropolis--Hastings bước ngẫu nhiên cho
+M1. Thuật toán lấy mẫu trên không gian $(\beta_0, \beta_1, \log\sigma)$, có cộng
+Jacobian $\log\sigma$ vào logarit hậu nghiệm, với bước đề xuất phân phối chuẩn
+có độ lệch chuẩn \num{0.08}. Nhóm chạy 4 chuỗi, mỗi chuỗi \num{6000} vòng và bỏ
+\num{1000} vòng đầu, tỉ lệ chấp nhận đạt từ \num{0.41} đến \num{0.43}.
+Metropolis--Hastings cho hậu nghiệm giống NUTS ($\beta_{\HP} = -0{,}708$ so với
+$-0{,}710$) nhưng kém hiệu quả hơn nhiều. Từ \num{20000} mẫu, thuật toán chỉ thu
+được cỡ mẫu hiệu dụng khoảng \num{1700}, trong khi NUTS đạt khoảng \num{12000}
+từ \num{8000} mẫu. Nguyên nhân là mỗi bước Metropolis--Hastings chỉ di chuyển một
+quãng ngắn, khiến các mẫu liên tiếp tự tương quan mạnh (hình~\ref{fig:mh}).
 
 \resultfig[0.85]{fig_4_2_mh_trace}{Biểu đồ vết của Metropolis--Hastings tự viết
   cho M1, bốn chuỗi.}{fig:mh}
 
 \section{Chẩn đoán hội tụ}
 
-Nhóm dùng bốn tiêu chí: $\Rhat$ (tính theo thứ hạng) \cite{vehtari2021rhat} nhỏ
-hơn \num{1.01}, cỡ mẫu hiệu dụng (ESS) bulk và tail đều trên 400, không có bước
-phân kỳ (divergence), và biểu đồ vết cùng biểu đồ thứ hạng không có dấu hiệu bất
-thường. Cả năm mô hình đều đạt (bảng~\ref{tab:diagnostics}); biểu đồ vết của mô
-hình cuối ở hình~\ref{fig:trace} cho thấy bốn chuỗi trộn đều. Code sẽ dừng nếu có
-mô hình không đạt, nên không có hệ số nào được lấy từ chuỗi chưa hội tụ.
+Sự hội tụ được đánh giá theo bốn tiêu chí: $\Rhat$ (phiên bản dựa trên thứ hạng
+\cite{vehtari2021rhat}) nhỏ hơn \num{1.01}, cỡ mẫu hiệu dụng (ESS) bulk và tail
+đều lớn hơn 400, không có bước phân kỳ (divergence), và biểu đồ vết cũng như biểu
+đồ thứ hạng không có dấu hiệu bất thường. Cả năm mô hình đều thoả mãn các tiêu
+chí này (bảng~\ref{tab:diagnostics}). Biểu đồ vết của mô hình cuối
+(hình~\ref{fig:trace}) cho thấy bốn chuỗi trộn đều vào nhau. Code được thiết lập
+để dừng lại nếu có mô hình không đạt, vì vậy mọi hệ số trong báo cáo đều được
+tính từ các chuỗi đã hội tụ.
 
 \begin{table}[tp]
   \centering
@@ -529,11 +552,11 @@ mô hình không đạt, nên không có hệ số nào được lấy từ chu�
 \section{Bảng tóm tắt hậu nghiệm}
 \label{sec:posterior}
 
-Bảng~\ref{tab:posterior} cho trung bình hậu nghiệm và HDI 95\% trên thang chuẩn
-hoá. Hệ số của HP và Weight là mức thay đổi của $\log(\City)$ chuẩn hoá khi biến
-tăng một độ lệch chuẩn; hệ số của USA là chênh lệch giữa xe Mỹ và xe nước ngoài.
-M5 có thêm $\nu = 9{,}4$ với HDI 95\% là $[1{,}8;\, 24{,}7]$, tức đuôi phân phối
-dày vừa phải.
+Bảng~\ref{tab:posterior} trình bày trung bình hậu nghiệm và HDI 95\% của các hệ
+số trên thang chuẩn hoá. Hệ số của HP và Weight cho biết $\log(\City)$ chuẩn hoá
+thay đổi bao nhiêu khi biến tương ứng tăng một độ lệch chuẩn, còn hệ số của USA
+là chênh lệch giữa xe Mỹ và xe nước ngoài. M5 có thêm tham số $\nu = 9{,}4$ (HDI
+95\%: $[1{,}8;\, 24{,}7]$), cho thấy phân phối sai số có đuôi dày ở mức vừa phải.
 
 \begin{table}[tp]
   \centering
@@ -555,13 +578,14 @@ dày vừa phải.
   \end{tabular}
 \end{table}
 
-Khi thêm Weight ở M4 và M5, hệ số của HP giảm từ khoảng $-0{,}7$ xuống khoảng
-$-0{,}1$, còn $\sigma$ giảm từ \num{0.68} (M3) xuống \num{0.47} (M4). Xe mạnh
-thường cũng là xe nặng, nên liên hệ giữa HP và City trong M1--M3 phần lớn chính là
-liên hệ giữa Weight và City. Dữ liệu quan sát không đủ để tách riêng tác động của
-từng biến (hình~\ref{fig:forest}). Lưu ý ở M1--M4, $\sigma$ là độ lệch chuẩn của
-sai số; còn ở M5, $\sigma$ là tham số thang đo của phân phối Student-t nên không
-so trực tiếp được với các mô hình khác (xem mục~\ref{sec:q3}).
+Khi bổ sung Weight ở M4 và M5, hệ số của HP giảm từ khoảng $-0{,}7$ xuống còn
+khoảng $-0{,}1$, đồng thời $\sigma$ giảm từ \num{0.68} (M3) xuống \num{0.47}
+(M4). Nguyên nhân là xe công suất lớn thường cũng nặng hơn, nên phần lớn mối liên
+hệ giữa HP và City ở M1--M3 thực chất phản ánh liên hệ giữa Weight và City. Với
+dữ liệu quan sát, không thể tách bạch hoàn toàn tác động riêng của từng biến
+(hình~\ref{fig:forest}). Cần lưu ý rằng $\sigma$ ở M1--M4 là độ lệch chuẩn của
+sai số, còn ở M5 là tham số thang đo của phân phối Student-t, nên hai loại giá
+trị này không so sánh trực tiếp được (xem mục~\ref{sec:q3}).
 
 \resultfig[0.7]{fig_4_4_forest}{Hệ số hậu nghiệm của M1--M5 trên thang chuẩn
   hoá, trung bình và HDI 95\%.}{fig:forest}
@@ -572,13 +596,14 @@ so trực tiếp được với các mô hình khác (xem mục~\ref{sec:q3}).
 
 \section{Kiểm tra dự đoán hậu nghiệm}
 
-Với mỗi mô hình, nhóm sinh \num{8000} bộ dữ liệu từ hậu nghiệm, đổi về MPG, rồi
-so mật độ của chúng với dữ liệu thật (hình~\ref{fig:ppc}). Cả năm mô hình đều tái
-tạo tốt trung bình của City, với p-value Bayes từ \num{0.38} đến \num{0.47}.
-M1--M4 không tái tạo được hai đầu phân phối: dữ liệu sinh ra hiếm khi có xe đạt
-46 MPG như Geo Metro, p-value của giá trị lớn nhất chỉ từ \num{0.006} đến
-\num{0.024}. M5 tốt hơn ở cả hai đầu, p-value của giá trị lớn nhất là \num{0.041}
-và của giá trị nhỏ nhất là \num{0.044}.
+Với mỗi mô hình, nhóm sinh \num{8000} bộ dữ liệu từ phân phối dự đoán hậu
+nghiệm, chuyển về đơn vị MPG rồi so sánh mật độ với dữ liệu thực
+(hình~\ref{fig:ppc}). Cả năm mô hình đều tái tạo tốt giá trị trung bình của
+City, với p-value Bayes nằm trong khoảng \num{0.38} đến \num{0.47}. Tuy nhiên,
+M1--M4 không tái tạo được hai đầu của phân phối. Dữ liệu mô phỏng hiếm khi có xe
+đạt 46 MPG như Geo Metro, và p-value của giá trị lớn nhất chỉ từ \num{0.006} đến
+\num{0.024}. M5 cải thiện ở cả hai đầu, với p-value của giá trị lớn nhất là
+\num{0.041} và của giá trị nhỏ nhất là \num{0.044}.
 
 \resultfig[0.95]{fig_5_1_ppc}{Kiểm tra dự đoán hậu nghiệm: mật độ dữ liệu thật
   (đen) và 100 bộ dữ liệu sinh từ hậu nghiệm (xanh).}{fig:ppc}
@@ -586,13 +611,14 @@ và của giá trị nhỏ nhất là \num{0.044}.
 \section{So sánh mô hình}
 \label{sec:compare}
 
-Nhóm so sánh các mô hình bằng ELPD ước lượng qua PSIS-LOO và WAIC
-\cite{vehtari2017loo}, tính bằng ArviZ \cite{kumar2019arviz}. Hai tiêu chí cho
-cùng thứ hạng (bảng~\ref{tab:compare}). Mô hình được chọn là M5, có ELPD cao nhất
-và trọng số stacking \num{0.97}. M5 hơn M4 \num{4.45} đơn vị ELPD, với sai số
-chuẩn \num{2.60}, tức khoảng \num{1.7} lần sai số chuẩn: đủ để chọn M5 nhưng
-chênh lệch không lớn. Nhóm có Weight (M4, M5) hơn nhóm không có (M1--M3) từ 34
-đến 43 đơn vị ELPD, tức hơn bốn lần sai số chuẩn.
+Các mô hình được so sánh qua ELPD, ước lượng bằng PSIS-LOO và WAIC
+\cite{vehtari2017loo} với thư viện ArviZ \cite{kumar2019arviz}. Hai tiêu chí cho
+cùng một thứ hạng (bảng~\ref{tab:compare}). M5 có ELPD cao nhất và trọng số
+stacking \num{0.97} nên được chọn làm mô hình cuối. M5 hơn M4 \num{4.45} đơn vị
+ELPD với sai số chuẩn \num{2.60}, tức khoảng \num{1.7} lần sai số chuẩn. Mức
+chênh này đủ để ưu tiên M5, dù không quá lớn. Trong khi đó, các mô hình có
+Weight (M4, M5) vượt các mô hình không có Weight (M1--M3) từ 34 đến 43 đơn vị
+ELPD, tương đương hơn bốn lần sai số chuẩn.
 
 \begin{table}[tp]
   \centering
@@ -611,8 +637,8 @@ chênh lệch không lớn. Nhóm có Weight (M4, M5) hơn nhóm không có (M1-
   \end{tabular}
 \end{table}
 
-Không có quan sát nào có Pareto $k$ vượt \num{0.7}, nên ước lượng PSIS-LOO dùng
-được cho mọi mô hình (hình~\ref{fig:compare}).
+Không quan sát nào có Pareto $k$ vượt \num{0.7}, nên ước lượng PSIS-LOO đáng tin
+cậy với cả năm mô hình (hình~\ref{fig:compare}).
 
 \resultfig[0.7]{fig_5_2_compare}{ELPD-LOO của năm mô hình, kèm sai số chuẩn và
   sai số chuẩn của chênh lệch so với mô hình tốt nhất.}{fig:compare}
@@ -620,28 +646,29 @@ Không có quan sát nào có Pareto $k$ vượt \num{0.7}, nên ước lượng
 \section{Trả lời Q1: quan hệ giữa các biến}
 \label{sec:q1}
 
-Công suất và hiệu suất nhiên liệu có quan hệ nghịch rõ rệt, nhưng khi thêm trọng
-lượng vào mô hình thì hệ số của công suất nhỏ đi nhiều. Trên thang logarit, khi
-HP tăng 10 thì trung vị có điều kiện của City được nhân với
-$\exp(10\, \beta_{\HP}\, s_\ell / s_{\HP})$, trong đó $s_{\HP}$ là độ lệch chuẩn
-của HP. Vì vậy các phần trăm dưới đây là mức thay đổi tương đối của trung vị
-City.
+Công suất và hiệu suất nhiên liệu có quan hệ nghịch biến rõ rệt, nhưng hệ số của
+công suất giảm mạnh khi trọng lượng được đưa vào mô hình. Do mô hình đặt trên
+thang logarit, khi HP tăng 10 đơn vị, trung vị có điều kiện của City được nhân
+với $\exp(10\, \beta_{\HP}\, s_\ell / s_{\HP})$, với $s_{\HP}$ là độ lệch chuẩn
+của HP. Các tỉ lệ phần trăm dưới đây vì thế là mức thay đổi tương đối của trung
+vị City.
 
 \begin{itemize}
-  \item Chỉ dùng HP (M1): mỗi 10 hp tăng thêm làm City giảm 3{,}0\%, HDI 95\% từ
-    $-3{,}6\%$ đến $-2{,}4\%$. Từ 140 lên 150 hp, trung vị City giảm \num{0.66}
-    MPG, HDI 95\% từ $-0{,}80$ đến $-0{,}52$ MPG (hình~\ref{fig:q1}).
-  \item Với cùng Weight (M5): mức giảm ứng với 10 hp chỉ còn $-0{,}45\%$, HDI 95\%
-    từ $-1{,}07\%$ đến $+0{,}10\%$, xác suất hệ số âm là \num{0.94}.
-  \item Với cùng HP và xuất xứ: mỗi \SI{100}{kg} nặng hơn ứng với trung vị City
-    thấp hơn 6{,}2\%, HDI 95\% từ $-7{,}1\%$ đến $-5{,}0\%$.
+  \item Khi chỉ dùng HP (M1), mỗi 10 hp tăng thêm làm City giảm 3{,}0\% (HDI
+    95\% từ $-3{,}6\%$ đến $-2{,}4\%$). Chẳng hạn, khi công suất tăng từ 140 lên
+    150 hp, trung vị City giảm \num{0.66} MPG, HDI 95\% từ $-0{,}80$ đến
+    $-0{,}52$ MPG (hình~\ref{fig:q1}).
+  \item Khi cố định Weight (M5), mức giảm ứng với 10 hp chỉ còn $-0{,}45\%$ (HDI
+    95\% từ $-1{,}07\%$ đến $+0{,}10\%$), xác suất hệ số âm là \num{0.94}.
+  \item Khi cố định HP và xuất xứ, mỗi \SI{100}{kg} tăng thêm ứng với trung vị
+    City giảm 6{,}2\% (HDI 95\% từ $-7{,}1\%$ đến $-5{,}0\%$).
 \end{itemize}
 
-Các biểu đồ phân tán ở mục~\ref{sec:eda} cũng cho thấy điều này: City giảm theo
-cả HP, Weight và Engine Size theo dạng cong, và tương quan với Weight mạnh hơn
-với HP. City và Open Road có tương quan \num{0.94}, nên Open Road nhiều khả năng
-có xu hướng tương tự; tuy nhiên muốn có kết luận định lượng cho Open Road thì
-phải ước lượng mô hình riêng cho biến này.
+Kết quả này phù hợp với các biểu đồ phân tán ở mục~\ref{sec:eda}, trong đó City
+giảm phi tuyến theo cả HP, Weight và Engine Size, và tương quan với Weight mạnh
+hơn với HP. Do City và Open Road tương quan tới \num{0.94}, nhiều khả năng Open
+Road cũng có xu hướng tương tự. Tuy vậy, để có kết luận định lượng cho Open Road
+cần ước lượng một mô hình riêng cho biến này.
 
 \resultfig[0.7]{fig_5_3_q1_m1_fit}{M1: City theo HP, với HDI 95\% của trung vị
   có điều kiện (xanh đậm) và khoảng dự đoán 95\% (xanh nhạt).}{fig:q1}
@@ -649,13 +676,13 @@ phải ước lượng mô hình riêng cho biến này.
 \section{Trả lời Q2: xe Mỹ và xe nước ngoài}
 \label{sec:q2}
 
-Xe Mỹ kém tiết kiệm hơn xe nước ngoài cùng công suất, nhưng khoảng cách này giảm
-nhiều khi thêm trọng lượng vào mô hình, vì xe Mỹ trong mẫu nặng hơn
-(bảng~\ref{tab:q2}). Điều này cho thấy xuất xứ và trọng lượng gắn chặt với nhau
-trong dữ liệu, chứ chưa chứng minh trọng lượng là nguyên nhân. Khi chỉ xét cùng
-HP, xe Mỹ có City thấp hơn khoảng 8{,}6\% và xác suất hậu nghiệm để xe Mỹ tiết
-kiệm hơn chỉ là \num{0.003}. Khi xét thêm cùng Weight, khoảng cách chỉ còn
-3{,}3\% và HDI 95\% chạm 0.
+Ở cùng mức công suất, xe Mỹ kém tiết kiệm nhiên liệu hơn xe nước ngoài, nhưng
+khoảng cách này thu hẹp đáng kể khi đưa trọng lượng vào mô hình, do xe Mỹ trong
+mẫu nhìn chung nặng hơn (bảng~\ref{tab:q2}). Kết quả này cho thấy xuất xứ và
+trọng lượng gắn liền với nhau trong dữ liệu, song chưa đủ để kết luận trọng
+lượng là nguyên nhân. Khi chỉ kiểm soát HP, City của xe Mỹ thấp hơn khoảng
+8{,}6\% và xác suất hậu nghiệm để xe Mỹ tiết kiệm hơn chỉ là \num{0.003}. Khi
+kiểm soát thêm Weight, khoảng cách còn 3{,}3\% và HDI 95\% chạm mốc 0.
 
 \begin{table}[tp]
   \centering
@@ -672,12 +699,13 @@ kiệm hơn chỉ là \num{0.003}. Khi xét thêm cùng Weight, khoảng cách c
   \end{tabular}
 \end{table}
 
-Trong M3, hệ số tương tác $\HP \times \USA$ dương, bằng \num{0.29} với HDI 95\%
-$[0{,}03;\, 0{,}59]$ và xác suất dương \num{0.98}. Nghĩa là xe nước ngoài tiết
-kiệm hơn hẳn ở công suất thấp nhưng mất dần lợi thế khi HP tăng, và hai đường hồi
-quy gặp nhau quanh 200 hp (hình~\ref{fig:q2}, trái). Theo mục~\ref{sec:sensitivity},
-kết quả này thay đổi khi đổi tiên nghiệm, nên nhóm chỉ coi đây là gợi ý chứ chưa
-phải kết luận chắc chắn. Khi giữ Weight ở mức trung bình (hình~\ref{fig:q2},
+Trong M3, hệ số tương tác $\HP \times \USA$ mang dấu dương, bằng \num{0.29} (HDI
+95\%: $[0{,}03;\, 0{,}59]$), với xác suất dương là \num{0.98}. Điều này có nghĩa
+là xe nước ngoài tiết kiệm hơn hẳn ở phân khúc công suất thấp, nhưng lợi thế này
+giảm dần khi HP tăng, và hai đường hồi quy giao nhau ở khoảng 200 hp
+(hình~\ref{fig:q2}, trái). Tuy nhiên, như đã chỉ ra ở mục~\ref{sec:sensitivity},
+kết quả này nhạy với lựa chọn tiên nghiệm, nên nhóm chỉ xem đây là một dấu hiệu
+cần kiểm chứng thêm. Khi cố định Weight ở mức trung bình (hình~\ref{fig:q2},
 phải), hai đường gần như trùng nhau.
 
 \resultfig[0.95]{fig_5_4_q2_usa}{Đường hồi quy và HDI 95\% cho xe Mỹ và xe nước
@@ -687,12 +715,12 @@ phải), hai đường gần như trùng nhau.
 \section{Trả lời Q3: các điểm ngoại lai}
 \label{sec:q3}
 
-Nhóm xét phần dư chuẩn hoá và Pareto $k$ từ M4 (bản hàm hợp lý chuẩn của mô hình
-cuối), rồi so với M5 (bảng~\ref{tab:outliers}, hình~\ref{fig:q3}). Phần dư chuẩn
-hoá là hiệu giữa $y_i$ và trung bình hậu nghiệm của $\mu_i$, chia cho trung bình
-hậu nghiệm của $\sigma$. Pareto $k$ cho biết một quan sát ảnh hưởng đến hậu
-nghiệm nhiều hay ít: $k$ lớn nghĩa là nếu bỏ quan sát đó thì hậu nghiệm thay đổi
-nhiều.
+Để xác định các điểm ngoại lai, nhóm xem xét phần dư chuẩn hoá và Pareto $k$ của
+M4 (phiên bản dùng hàm hợp lý chuẩn của mô hình cuối), sau đó so sánh với M5
+(bảng~\ref{tab:outliers}, hình~\ref{fig:q3}). Phần dư chuẩn hoá được tính bằng
+hiệu giữa $y_i$ và trung bình hậu nghiệm của $\mu_i$, chia cho trung bình hậu
+nghiệm của $\sigma$. Pareto $k$ đo mức ảnh hưởng của từng quan sát lên hậu
+nghiệm, $k$ càng lớn thì hậu nghiệm càng thay đổi nhiều khi loại bỏ quan sát đó.
 
 \begin{table}[tp]
   \centering
@@ -721,26 +749,28 @@ nhiều.
   \end{tabular}
 \end{table}
 
-Nhóm xe van có City từ 15 đến 18 MPG trông bất thường khi mô hình chỉ dùng HP,
-nhưng khi có Weight thì phần dư của chúng chỉ từ $-1{,}6$ đến $+0{,}3$. Vậy City
-thấp của các xe này là do chúng nặng chứ không phải do công suất. Ba xe cỡ nhỏ
-Honda Civic, Geo Metro và Suzuki Swift tiết kiệm hơn mức mà một đường
-log-tuyến tính dự đoán, còn Mazda RX-7 và Volkswagen Corrado tốn nhiên liệu hơn
-dự đoán. Giải thích về phiên bản động cơ của Honda Civic chỉ là giả thuyết của
-nhóm, vì dữ liệu không ghi phiên bản.
+Nhóm xe van có City từ 15 đến 18 MPG trông như ngoại lai khi mô hình chỉ có HP,
+nhưng khi thêm Weight thì phần dư của chúng chỉ còn từ $-1{,}6$ đến $+0{,}3$.
+Như vậy, City thấp của các xe van được giải thích bởi trọng lượng lớn. Ba xe cỡ
+nhỏ Honda Civic, Geo Metro và Suzuki Swift tiết kiệm hơn mức dự đoán của mô hình
+log-tuyến tính, ngược lại Mazda RX-7 và Volkswagen Corrado tốn nhiên liệu hơn dự
+đoán. Riêng lời giải thích về phiên bản động cơ của Honda Civic chỉ là giả
+thuyết, vì dữ liệu không ghi rõ phiên bản.
 
-So với M4, M5 giảm trọng số của các điểm này: Pareto $k$ lớn nhất giảm từ
-\num{0.54} xuống \num{0.46}, và $\beta_{\HP}$ giảm độ lớn từ $-0{,}15$ xuống
-$-0{,}11$, HDI 95\% giờ chứa 0. Hệ số của Weight giữ nguyên ở $-0{,}76$, nên liên
-hệ giữa trọng lượng và City không phụ thuộc vào các điểm ngoại lai.
+So với M4, M5 giảm bớt ảnh hưởng của các điểm này. Pareto $k$ lớn nhất giảm từ
+\num{0.54} xuống \num{0.46}, còn $\beta_{\HP}$ giảm về độ lớn từ $-0{,}15$ xuống
+$-0{,}11$ và HDI 95\% lúc này chứa 0. Hệ số của Weight vẫn giữ ở mức $-0{,}76$,
+cho thấy liên hệ giữa trọng lượng và City không bị chi phối bởi các điểm ngoại
+lai.
 
-Tham số $\sigma$ của M5 bằng \num{0.38}, nhỏ hơn \num{0.47} của M4, nhưng hai số
-này không so trực tiếp được. Với Student-t, $\sigma$ là tham số thang đo; độ lệch
-chuẩn của sai số bằng $\sigma\sqrt{\nu/(\nu-2)}$ khi $\nu > 2$ và vô hạn khi
-$\nu \le 2$ (chỉ \num{0.3}\% mẫu hậu nghiệm có $\nu \le 2$). Khi đổi về cùng
-thước đo, độ lệch chuẩn sai số của M5 có trung vị hậu nghiệm khoảng \num{0.45},
-gần bằng M4. Vậy M5 không làm sai số nhỏ đi; khác biệt là phần lớn xe nằm sát
-đường hồi quy hơn, còn vài xe ngoại lai rơi vào phần đuôi dày của Student-t.
+Tham số $\sigma$ của M5 bằng \num{0.38}, nhỏ hơn mức \num{0.47} của M4, nhưng hai
+giá trị này không so sánh trực tiếp được. Với phân phối Student-t, $\sigma$ là
+tham số thang đo, còn độ lệch chuẩn của sai số bằng $\sigma\sqrt{\nu/(\nu-2)}$
+khi $\nu > 2$ và bằng vô cùng khi $\nu \le 2$ (chỉ \num{0.3}\% mẫu hậu nghiệm rơi
+vào trường hợp này). Quy về cùng thước đo, độ lệch chuẩn sai số của M5 có trung
+vị hậu nghiệm khoảng \num{0.45}, xấp xỉ M4. Vì thế, M5 không làm sai số nhỏ đi.
+Điểm khác biệt nằm ở chỗ phần lớn các xe bám sát đường hồi quy hơn, còn một vài
+xe ngoại lai được hấp thụ vào phần đuôi dày của phân phối Student-t.
 
 \resultfig[0.95]{fig_5_5_q3_outliers}{Phần dư chuẩn hoá theo giá trị dự đoán của
   M4 (trái) và Pareto $k$ của từng quan sát với M4 và M5 (phải).}{fig:q3}
@@ -748,21 +778,22 @@ gần bằng M4. Vậy M5 không làm sai số nhỏ đi; khác biệt là phầ
 \section{Trả lời Q4: dự đoán cho xe 300 hp}
 \label{sec:q4}
 
-Biến phản hồi là City và biến giải thích chính là Horsepower. Nếu chỉ biết công
-suất thì M1 là mô hình đúng với câu hỏi của đề: trung vị City của một xe 300 hp
-khoảng \num{13.6} MPG, khoảng dự đoán 95\% từ \num{9.7} đến \num{18.8} MPG. M5 cần
-biết thêm xuất xứ và trọng lượng, nên kết quả của M5 chỉ áp dụng cho một xe cụ
-thể. Với xe Mỹ 300 hp nặng \SI{1681}{kg} (trọng lượng trung bình của ba xe thật
-có từ 295 hp trở lên), trung vị City khoảng \num{16.6} MPG, khoảng dự đoán 95\%
-từ \num{13.4} đến \num{20.6} MPG (bảng~\ref{tab:q4}). Một xe 300 hp nặng hơn hay
-nhẹ hơn sẽ có dự đoán khác.
+Biến phản hồi được chọn là City và biến giải thích chính là Horsepower. Nếu chỉ
+biết công suất, M1 là mô hình phù hợp nhất với câu hỏi của đề. Theo M1, trung vị
+City của một xe 300 hp vào khoảng \num{13.6} MPG, khoảng dự đoán 95\% từ
+\num{9.7} đến \num{18.8} MPG. M5 đòi hỏi thêm thông tin về xuất xứ và trọng
+lượng, nên dự đoán của M5 chỉ áp dụng cho một cấu hình xe cụ thể. Với một xe Mỹ
+300 hp nặng \SI{1681}{kg} (trọng lượng trung bình của ba xe trong mẫu có công
+suất từ 295 hp trở lên), trung vị City vào khoảng \num{16.6} MPG, khoảng dự đoán
+95\% từ \num{13.4} đến \num{20.6} MPG (bảng~\ref{tab:q4}). Một xe 300 hp nặng hơn
+hoặc nhẹ hơn sẽ cho kết quả dự đoán khác.
 
-Vì mô hình đặt trên $\log(\City)$, $\exp(\mu)$ là trung vị có điều kiện của City
-chứ không phải trung bình; cột thứ ba của bảng là trung bình hậu nghiệm của trung
-vị này. Với M5, trung bình của City khi $\log(\City)$ có phân phối Student-t
-thậm chí là vô hạn, nên nhóm chỉ báo cáo trung vị và khoảng dự đoán. Khoảng dự
-đoán khác HDI của trung vị ở chỗ nó tính cả sai số của từng xe, nên rộng hơn
-nhiều.
+Do mô hình được xây dựng trên $\log(\City)$, $\exp(\mu)$ là trung vị có điều kiện
+của City, không phải trung bình. Cột thứ ba của bảng là trung bình hậu nghiệm của
+trung vị này. Với M5, khi $\log(\City)$ có phân phối Student-t thì kỳ vọng của
+City thậm chí không hữu hạn, nên nhóm chỉ báo cáo trung vị và khoảng dự đoán.
+Khoảng dự đoán khác HDI của trung vị ở chỗ nó tính thêm sai số của từng xe, vì
+vậy rộng hơn đáng kể.
 
 \begin{table}[tp]
   \centering
@@ -781,14 +812,15 @@ nhiều.
   \end{tabular}
 \end{table}
 
-Ba xe thật gần 300 hp trong mẫu đều là xe Mỹ. Khi dùng thông số riêng của từng
-xe, khoảng dự đoán của M5 đều chứa giá trị thật (bảng~\ref{tab:q4-real}). Tuy
-nhiên ba xe này nằm trong dữ liệu dùng để ước lượng mô hình, nên đây chỉ là kiểm
-tra trên mẫu học, chưa phải kiểm tra khả năng dự đoán cho xe mới. M1 dự đoán thấp
-hơn thực tế (\num{13.6} MPG), vì đường log-tuyến tính theo HP tiếp tục đi xuống ở
-phía phải, trong khi xe 300 hp thực tế không nặng hơn xe 200 hp bao nhiêu
-(hình~\ref{fig:q4}). Vì 300 hp là giá trị lớn nhất trong mẫu, mọi dự đoán ở đây
-đều nằm ở rìa dữ liệu.
+Cả ba xe có công suất gần 300 hp trong mẫu đều là xe Mỹ. Khi dùng thông số riêng
+của từng xe, khoảng dự đoán của M5 đều chứa giá trị thực
+(bảng~\ref{tab:q4-real}). Tuy vậy, ba xe này đã nằm trong dữ liệu dùng để ước
+lượng mô hình, nên đây mới chỉ là kiểm tra trên mẫu học, chưa phản ánh khả năng
+dự đoán cho xe mới. M1 cho dự đoán thấp hơn thực tế (\num{13.6} MPG) vì đường
+log-tuyến tính theo HP tiếp tục đi xuống ở vùng công suất cao, trong khi xe
+300 hp trên thực tế không nặng hơn xe 200 hp là bao (hình~\ref{fig:q4}). Cũng
+cần lưu ý rằng 300 hp là giá trị lớn nhất trong mẫu, nên mọi dự đoán ở đây đều
+nằm ở biên của dữ liệu.
 
 \begin{table}[tp]
   \centering
@@ -810,52 +842,56 @@ phía phải, trong khi xe 300 hp thực tế không nặng hơn xe 200 hp bao n
 
 \section{Hạn chế}
 
-Mẫu chỉ có 93 xe và chỉ có ba xe trên 280 hp, nên dự đoán ở rìa dữ liệu kém chắc
-chắn. Dữ liệu từ năm 1993, công nghệ động cơ khi đó khác xa hiện nay, nên kết quả
-không áp dụng cho xe ngày nay. Các quan hệ tìm được là tương quan chứ không phải
-nhân quả, và dự đoán ngoài khoảng 55--300 hp hoặc 769--\SI{1862}{kg} không đáng
-tin. Phần kiểm tra dự đoán ở Q4 chỉ dùng các xe đã có trong dữ liệu học; nhóm
-chưa đánh giá khả năng dự đoán trên xe ngoài mẫu.
+Báo cáo còn một số hạn chế. Thứ nhất, mẫu chỉ có 93 xe, trong đó chỉ ba xe có
+công suất trên 280 hp, nên dự đoán ở vùng biên có độ bất định lớn. Thứ hai, dữ
+liệu được thu thập năm 1993, khi công nghệ động cơ còn khác xa hiện nay, nên
+không thể áp dụng trực tiếp kết quả cho xe ngày nay. Thứ ba, các quan hệ tìm
+được chỉ là tương quan, không phải quan hệ nhân quả, và dự đoán ngoài khoảng
+55--300 hp hoặc 769--\SI{1862}{kg} không đáng tin cậy. Cuối cùng, phần kiểm tra
+dự đoán ở Q4 chỉ dùng các xe có sẵn trong dữ liệu học, nhóm chưa đánh giá khả
+năng dự đoán trên dữ liệu ngoài mẫu.
 
 % ===========================================================================
 \chapter{Kết luận}
 \label{sec:conclusion}
 
-Trong mẫu 93 xe năm 1993, trọng lượng là biến liên hệ mạnh nhất với hiệu suất
-nhiên liệu trong thành phố. Đây là kết luận về liên hệ trên dữ liệu quan sát,
-không phải về quan hệ nhân quả. Mô hình cuối M5, $\log(\City) \sim \HP + \Wt +
-\USA$ với hàm hợp lý Student-t, hội tụ tốt, tái tạo dữ liệu tốt nhất và đứng đầu
-theo cả PSIS-LOO lẫn WAIC.
+Trong mẫu 93 xe năm 1993, trọng lượng là biến có liên hệ chặt chẽ nhất với hiệu
+suất nhiên liệu trong thành phố. Mô hình cuối cùng là M5,
+$\log(\City) \sim \HP + \Wt + \USA$ với hàm hợp lý Student-t. Mô hình này hội tụ
+tốt, tái tạo dữ liệu tốt nhất và xếp hạng cao nhất theo cả PSIS-LOO lẫn WAIC.
+Các câu hỏi của đề được trả lời như sau.
 
-\paragraph{Q1, quan hệ giữa các biến.} Nếu chỉ xét HP, mỗi 10 hp cao hơn ứng với
-trung vị City thấp hơn 3{,}0\%. Với cùng Weight, mức này gần như bằng 0, chỉ còn
-$-0{,}45\%$, trong khi mỗi \SI{100}{kg} nặng hơn ứng với trung vị City thấp hơn
+\paragraph{Q1, quan hệ giữa các biến.} Nếu chỉ xét HP, mỗi 10 hp tăng thêm ứng
+với trung vị City giảm 3{,}0\%. Khi cố định Weight, mức giảm này gần như bằng 0
+($-0{,}45\%$), trong khi mỗi \SI{100}{kg} tăng thêm ứng với trung vị City giảm
 6{,}2\%. Open Road tương quan \num{0.94} với City nên nhiều khả năng có xu hướng
-tương tự, nhưng nhóm chưa xây dựng mô hình riêng cho biến này.
+tương tự, tuy nhiên nhóm chưa xây dựng mô hình riêng cho biến này.
 
-\paragraph{Q2, xe Mỹ và xe nước ngoài.} Cùng công suất, xe Mỹ kém tiết kiệm hơn
-8{,}6\%, xác suất điều ngược lại chỉ là \num{0.003}. Khi tính cả Weight, khoảng
-cách chỉ còn 3{,}3\% và HDI 95\% chạm 0. Vậy phần lớn chênh lệch giữa hai nhóm đi
-kèm với chênh lệch trọng lượng, dù dữ liệu quan sát không cho phép khẳng định
-trọng lượng là nguyên nhân.
+\paragraph{Q2, xe Mỹ và xe nước ngoài.} Ở cùng mức công suất, xe Mỹ kém tiết
+kiệm hơn khoảng 8{,}6\%, và xác suất để điều ngược lại xảy ra chỉ là
+\num{0.003}. Khi tính thêm Weight, khoảng cách còn 3{,}3\% và HDI 95\% chạm mốc
+0. Như vậy, phần lớn chênh lệch giữa hai nhóm đi kèm với chênh lệch về trọng
+lượng, dù dữ liệu quan sát chưa cho phép khẳng định trọng lượng là nguyên nhân.
 
 \paragraph{Q3, điểm ngoại lai.} Honda Civic, Geo Metro và Suzuki Swift tiết kiệm
-bất thường, còn Mazda RX-7 (động cơ rotary) và Volkswagen Corrado tốn nhiên liệu
-hơn dự đoán. Xe van chỉ là ngoại lai khi bỏ qua trọng lượng. Các kết luận chính
-không đổi khi chuyển sang hàm hợp lý Student-t.
+nhiên liệu bất thường, trong khi Mazda RX-7 (động cơ rotary) và Volkswagen
+Corrado tốn nhiên liệu hơn dự đoán. Các xe van chỉ trông như ngoại lai khi bỏ
+qua trọng lượng. Những kết luận chính không thay đổi khi chuyển sang hàm hợp lý
+Student-t.
 
-\paragraph{Q4, xe 300 hp.} Nếu chỉ biết công suất (M1), trung vị City của một xe
-300 hp khoảng \num{13.6} MPG, khoảng dự đoán 95\% từ \num{9.7} đến \num{18.8} MPG.
-Nếu biết thêm đó là xe Mỹ nặng \SI{1681}{kg} (M5), trung vị City khoảng
-\num{16.6} MPG, khoảng dự đoán 95\% từ \num{13.4} đến \num{20.6} MPG. Ba xe thật
-gần 300 hp đều nằm trong khoảng của M5, nhưng chúng thuộc dữ liệu học nên đây chỉ
-là kiểm tra trên mẫu học.
+\paragraph{Q4, xe 300 hp.} Nếu chỉ biết công suất (M1), trung vị City của xe
+300 hp vào khoảng \num{13.6} MPG, khoảng dự đoán 95\% từ \num{9.7} đến \num{18.8}
+MPG. Nếu biết thêm đó là xe Mỹ nặng \SI{1681}{kg} (M5), trung vị City vào khoảng
+\num{16.6} MPG, khoảng dự đoán 95\% từ \num{13.4} đến \num{20.6} MPG. Cả ba xe
+thực tế gần 300 hp đều nằm trong khoảng dự đoán của M5, nhưng vì chúng thuộc dữ
+liệu học nên đây chưa phải là kiểm tra ngoài mẫu.
 
-\paragraph{Hướng phát triển.} Có thể dùng mô hình phân cấp theo Type, trong đó
-mỗi loại xe có hệ số chặn riêng và các loại xe dùng chung thông tin với nhau, để
-tách phần chênh lệch do loại xe. Cũng có thể thêm các biến như Engine Size, Drive
-train hoặc Manual, hoặc thử biến phản hồi gallon trên dặm $1/\City$, vì trong
-phân tích sơ bộ biến này còn khớp tốt hơn.
+\paragraph{Hướng phát triển.} Một hướng mở rộng là xây dựng mô hình phân cấp theo
+Type, trong đó mỗi loại xe có hệ số chặn riêng nhưng chia sẻ thông tin với các
+loại khác, nhằm tách phần chênh lệch do loại xe gây ra. Ngoài ra, có thể bổ sung
+các biến như Engine Size, Drive train, Manual, hoặc thử dùng biến phản hồi là số
+gallon trên mỗi dặm ($1/\City$), vì trong phân tích sơ bộ biến này còn cho độ
+khớp tốt hơn.
 
 % ===========================================================================
 \appendix
@@ -863,10 +899,10 @@ phân tích sơ bộ biến này còn khớp tốt hơn.
 \chapter{Code và dữ liệu}
 \label{sec:appendix}
 
-Toàn bộ phân tích nằm trong notebook chung \texttt{bayes\_cars\_1993.ipynb},
-ghép từ năm module trong thư mục \texttt{analysis/}. Notebook chạy từ đầu đến cuối
-trong khoảng 8 phút với Python 3.12, PyMC 5.28 và ArviZ 0.23, seed 2026. Phân
-công như ở bảng~\ref{tab:modules}.
+Toàn bộ phân tích được tập hợp trong notebook \texttt{bayes\_cars\_1993.ipynb},
+ghép từ năm module trong thư mục \texttt{analysis/}. Với Python 3.12, PyMC 5.28
+và ArviZ 0.23 (seed 2026), notebook chạy hết trong khoảng 8 phút. Phân công từng
+module được ghi ở bảng~\ref{tab:modules}.
 
 \begin{table}[tp]
   \centering
@@ -885,10 +921,11 @@ công như ở bảng~\ref{tab:modules}.
   \end{tabular}
 \end{table}
 
-Dữ liệu đã làm sạch nằm ở \texttt{outputs/data\_clean.csv}, bảng hậu nghiệm đầy
-đủ của mọi mô hình ở \texttt{outputs/tables/tab\_4\_4\_posterior.csv}, và các
-hình ở \texttt{outputs/figures/}. Dưới đây là hàm khai báo chung cho năm mô hình
-trong PyMC.
+Dữ liệu sau khi làm sạch được lưu tại \texttt{outputs/data\_clean.csv}, bảng hậu
+nghiệm đầy đủ của các mô hình tại
+\texttt{outputs/tables/tab\_4\_4\_posterior.csv}, còn các hình nằm trong
+\texttt{outputs/figures/}. Hàm khai báo chung cho năm mô hình trong PyMC được
+trình bày dưới đây.
 
 \begin{lstlisting}
 def build_model(d, sc, terms, prior="weak", likelihood="normal"):
@@ -912,8 +949,8 @@ def build_model(d, sc, terms, prior="weak", likelihood="normal"):
 \chapter{Khai báo sử dụng AI}
 \label{sec:ai}
 
-Nhóm có dùng trợ lý AI \textbf{Claude} của Anthropic trong quá trình làm bài, cụ
-thể:
+Trong quá trình thực hiện, nhóm có sử dụng trợ lý AI \textbf{Claude} của
+Anthropic vào các việc sau:
 
 \begin{itemize}
   \item hỗ trợ viết, chú thích và sửa lỗi code Python (PyMC, ArviZ) trong thư mục
