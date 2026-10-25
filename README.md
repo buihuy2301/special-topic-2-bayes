@@ -6,6 +6,7 @@ Bài cuối kỳ môn chuyên đề **Mô hình hồi quy tuyến tính Bayes v�
 | Thư mục | Nội dung |
 | --- | --- |
 | `cuoi-ky-nhom10/` | Báo cáo `report/bao-cao-cuoi-ky-nhom10.pdf` (nguồn `.tex` cùng thư mục), notebook `bayes_cars_1993.ipynb`, code phân tích `analysis/`, dữ liệu `Q_10/`, kết quả `outputs/` |
+| `tai-lieu/` | Slide bài giảng của thầy: `Gioi thieu Thong ke Bayes.pdf`, `Slide_HQTT Bayes.pdf` (hồi quy tuyến tính Bayes) |
 | `shared/` | Mẫu trình bày LaTeX dùng chung: `layout.tex`, `preamble.tex`, `meta.tex` (tên môn, giảng viên), `refs.bib`, logo |
 
 Chi tiết cách chạy và các quyết định mô hình hoá: [`cuoi-ky-nhom10/README.md`](cuoi-ky-nhom10/README.md).
